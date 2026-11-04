@@ -252,7 +252,6 @@ const SEED={
  students:[],certs:[],apps:[],inq:[],payments:[],
 };
 SEED.programs=PROGRAMS_SEED;SEED.services=SERVICES_SEED;
-SEED.students.forEach(s=>s.password="123456");
 SEED.admins=[];
 SEED.settings={email:"info@theifbe.com",phone:"+962 7 9711 1173",whatsapp:"+962 7 9711 1173",website:"theifbe.com",addr_en:"Wilmington, Delaware, USA",addr_ar:"ويلمنغتون، ديلاوير، الولايات المتحدة",hours_en:"Sun–Thu, 9:00–17:00",hours_ar:"الأحد–الخميس، 9:00–17:00",facebook:"",instagram:"",linkedin:"",tiktok:"",logo:"",accr_ieqm:"",accr_cpd:"",accr_iso:"",hideDemo:true};
 SEED.content={en:{},ar:{}};
@@ -270,7 +269,7 @@ SEED.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});
 const TABLES={programs:["programs","id"],services:["services","id"],offices:["offices","id"],students:["students","id"],certs:["certificates","no"],apps:["applications","id"],inq:["inquiries","id"],payments:["payments","inv"],admins:["admins","email"]};
 const KEY="ifbe-site-v2";
 let S={lang:"ar",user:null,data:null,offFilter:"all",dTab:"overview",lastVerify:null,ready:!REAL,loginMode:"signin"};
-function migrate(){for(const k in SEED)if(S.data[k]==null)S.data[k]=structuredClone(SEED[k]);for(const k in SEED.settings)if(S.data.settings[k]===undefined)S.data.settings[k]=SEED.settings[k];const os=S.data.settings,ns=SEED.settings;if(os.email==="info@ifbe.org")os.email=ns.email;if(os.phone==="+1 (302) 555-0148")os.phone=ns.phone;if(os.whatsapp==="+962 7 9000 0000")os.whatsapp=ns.whatsapp;if(os.website==="www.ifbe.org")os.website=ns.website;S.data.content.en=S.data.content.en||{};S.data.content.ar=S.data.content.ar||{};S.data.students.forEach(s=>{if(!s.password)s.password="123456"});S.data.payments.forEach(p=>{if(p.sid===undefined)p.sid="S-1001"});S.data.services.forEach((x,i)=>{if(!x.id)x.id="SV-"+(i+1)});S.data.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});S.data.certs.forEach(c=>{if(!c.sid&&SID_BY_NAME[c.name])c.sid=SID_BY_NAME[c.name]})}
+function migrate(){for(const k in SEED)if(S.data[k]==null)S.data[k]=structuredClone(SEED[k]);for(const k in SEED.settings)if(S.data.settings[k]===undefined)S.data.settings[k]=SEED.settings[k];const os=S.data.settings,ns=SEED.settings;if(os.email==="info@ifbe.org")os.email=ns.email;if(os.phone==="+1 (302) 555-0148")os.phone=ns.phone;if(os.whatsapp==="+962 7 9000 0000")os.whatsapp=ns.whatsapp;if(os.website==="www.ifbe.org")os.website=ns.website;S.data.content.en=S.data.content.en||{};S.data.content.ar=S.data.content.ar||{};S.data.payments.forEach(p=>{if(p.sid===undefined)p.sid="S-1001"});S.data.services.forEach((x,i)=>{if(!x.id)x.id="SV-"+(i+1)});S.data.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});S.data.certs.forEach(c=>{if(!c.sid&&SID_BY_NAME[c.name])c.sid=SID_BY_NAME[c.name]})}
 function load(){try{const j=localStorage.getItem(KEY);if(j){const o=JSON.parse(j);S.data=o.data;S.lang=o.lang||"ar";S.user=o.user||null;migrate();return}}catch(e){}S.data=structuredClone(SEED)}
 function save(){
  if(REAL){try{localStorage.setItem(KEY+"-lang",S.lang)}catch(e){}clearTimeout(save._t);save._t=setTimeout(sync,120);return}
@@ -514,8 +513,8 @@ V.student=()=>{
 /* ---------- admin: generic CRUD ---------- */
 const F=(k,l,ty="text",o,ol,extra={})=>({k,l,ty,o,ol,...extra});
 const SCHEMA={
- students:{title:"a_students",f:[F("id","ID"),F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1}),F("password","password"),F("country","country"),F("prog","program","prog"),F("status","status","select",["active","graduated","suspended"]),F("progress","progress","number"),F("joined","date","date")],
-  auto:it=>{if(!it.id)it.id=uid("S-");if(!REAL&&!it.password)it.password="123456";if(!it.joined)it.joined=TODAY}},
+ students:{title:"a_students",f:[F("id","ID"),F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1}),F("country","country"),F("prog","program","prog"),F("status","status","select",["active","graduated","suspended"]),F("progress","progress","number"),F("joined","date","date")],
+  auto:it=>{if(!it.id)it.id=uid("S-");if(!it.joined)it.joined=TODAY}},
  certs:{title:"a_certs",f:[F("no","cert_no"),F("sid","student","student"),F("name","holder","text",0,0,{req:1}),F("prog","program","prog"),F("office","office","office"),F("issued","issued","date"),F("expires","expires","date"),F("status","status","select",["valid","revoked"])],
   auto:it=>{if(!it.no)it.no=nextCertNo(it.prog,it.issued);if(!it.issued)it.issued=TODAY;if(it.sid&&!it.name){const st=S.data.students.find(x=>x.id===it.sid);if(st)it.name=st.name}}},
  programs:{title:"a_programs",f:[F("id","code","text",0,0,{req:1}),F("track","track","select",[1,2,3],"track"),F("lvl","lvl","number"),F("price","price","number"),F("en","name_en","text",0,0,{req:1,dir:"ltr"}),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("den","desc_en","textarea",0,0,{dir:"ltr"}),F("dar","desc_ar","textarea",0,0,{dir:"rtl"}),F("wen","who_en","text",0,0,{dir:"ltr"}),F("war","who_ar","text",0,0,{dir:"rtl"}),F("oen","out_en","text",0,0,{dir:"ltr"}),F("oar","out_ar","text",0,0,{dir:"rtl"})]},
@@ -524,11 +523,11 @@ const SCHEMA={
   auto:it=>{it.id=Date.now();if(!it.x||!it.y){const [x,y]=REGXY[it.region]||[400,160];it.x=Math.round(x+Math.random()*30-15);it.y=Math.round(y+Math.random()*30-15)}}},
  payments:{title:"a_payments",f:[F("inv","invoice"),F("sid","student","student"),F("en","desc_en","text",0,0,{dir:"ltr"}),F("ar","desc_ar","text",0,0,{dir:"rtl"}),F("amt","amount","number"),F("date","date","date"),F("st","status","select",["paid","due","pending"])],
   auto:it=>{if(!it.inv)it.inv="INV-"+TODAY.slice(0,4)+"-"+String(1000+Math.floor(Math.random()*9000))}},
- admins:{title:"a_admins",f:[F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1,dir:"ltr"}),F("password","password","text",0,0,{req:1,dir:"ltr"})]},
+ admins:{title:"a_admins",f:[F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1,dir:"ltr"})]},
  apps:{title:"a_apps",f:[F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{dir:"ltr"}),F("country","country"),F("prog","program","prog"),F("exp","experience","number"),F("date","date","date"),F("status","status","select",["new","approved","rejected"])],
   auto:it=>{it.id=uid("A-")}},
 };
-if(REAL){SCHEMA.students.f=SCHEMA.students.f.filter(x=>x.k!=="password");SCHEMA.admins.f=SCHEMA.admins.f.filter(x=>x.k!=="password")}
+
 const NUMF=new Set(["progress","lvl","price","amt","exp","x","y","track","office"]);
 function optLabel(ol,v){if(ol==="track")return t(["","track_trainer","track_consult","track_acad"][v]);if(ol==="otype")return t({hq:"hq",reg:"regional",rep:"rep"}[v]);if(ol==="raw")return v;return t(v)}
 function editModal(coll,idx){
@@ -640,7 +639,7 @@ V.admin=()=>{
   D.inq.forEach(i=>i.read=true);save();
   body=`<h2>${t("a_inq")}</h2>${D.inq.length?D.inq.map((i,ix)=>[i,ix]).reverse().map(([i,ix])=>`<div class="card" style="display:grid;gap:8px"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>${esc(i.name)} <span class="muted" style="font-weight:400">· <span class="mono">${esc(i.email)}</span>${i.phone?` · <span class="mono">${esc(i.phone)}</span>`:""}</span></b><span class="pill info">${t(i.subj)} · ${esc(L(office(i.office)))}</span></div><p>${esc(i.msg)}</p><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><span class="muted" style="font-size:.8rem">${fmtDate(i.date)}</span><button class="btn btn-danger btn-sm" data-act="del" data-coll="inq" data-idx="${ix}">${t("del")}</button></div></div>`).join(""):`<p class="muted">${t("empty_inq")}</p>`}`}
  else if(S.dTab==="payments")body=`<h2>${t("a_payments")}</h2>`+crud("payments",[["invoice",x=>`<span class="mono">${esc(x.inv)}</span>`],["student",x=>{const s=D.students.find(s=>s.id===x.sid);return s?esc(s.name):`<span class="mono">${esc(x.sid||"—")}</span>`}],["details",x=>esc(L(x))],["date",x=>fmtDate(x.date)],["amount",x=>`<span class="num">${money(+x.amt||0)}</span>`],["status",x=>stPill(x.st)]]);
- else if(S.dTab==="admins")body=`<h2>${t("a_admins")}</h2><p class="muted">${t(REAL?"admins_hint_real":"admins_hint")}</p>`+crud("admins",[["name",a=>`<b>${esc(a.name)}</b>`],["email",a=>`<span class="mono">${esc(a.email)}</span>`],...(REAL?[]:[["password",a=>`<span class="mono">${"•".repeat(Math.min(10,(a.password||"").length))}</span>`]])]);
+ else if(S.dTab==="admins")body=`<h2>${t("a_admins")}</h2><p class="muted">${t(REAL?"admins_hint_real":"admins_hint")}</p>`+crud("admins",[["name",a=>`<b>${esc(a.name)}</b>`],["email",a=>`<span class="mono">${esc(a.email)}</span>`],]);
  return dashShell(items,body)};
 
 /* ---------- modals ---------- */
@@ -734,7 +733,7 @@ document.addEventListener("click",e=>{
  if(a==="import"){try{const o=JSON.parse(document.getElementById("bk_in").value);if(!o||!Array.isArray(o.certs))throw 0;S.data=o;migrate();save();render();toast(t("imported"))}catch(err){toast(t("bad_json"))}}
  if(a==="revoke"||a==="restore"){const c=D.certs.find(x=>x.no===b.dataset.no);c.status=a==="revoke"?"revoked":"valid";save();render()}
  if(a==="appok"||a==="appno"){const ap=D.apps.find(x=>x.id===b.dataset.id);ap.status=a==="appok"?"approved":"rejected";
-  if(a==="appok")D.students.push({id:uid("S-"),name:ap.name,email:ap.email,password:REAL?undefined:"123456",country:ap.country,prog:ap.prog,status:"active",progress:0,joined:TODAY});save();render()}
+  if(a==="appok")D.students.push({id:uid("S-"),name:ap.name,email:ap.email,country:ap.country,prog:ap.prog,status:"active",progress:0,joined:TODAY});save();render()}
  if(a==="reset"){if(!b.dataset.armed){b.dataset.armed="1";b.textContent=t("confirm_q");setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t("reset_demo")}},3000);return}S.data=structuredClone(SEED);save();toast(t("reset_ok"));render()}
 });
 document.addEventListener("input",e=>{if(e.target.id==="q"){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=document.getElementById("q");if(q){q.focus();q.setSelectionRange(pos,pos)}}});
@@ -757,11 +756,6 @@ document.addEventListener("submit",e=>{
   sb.auth.signInWithPassword({email:em,password:pw}).then(async({data,error})=>{if(error)return fail(t("bad_login_real"));
    await setSession(data.session);snap();S.dTab="overview";const r=S.user?.role;if(r==="admin")location.hash="admin";else if(r==="student")location.hash="student";render()});return}
  if(f.id==="rform"){sb.auth.updateUser({password:document.getElementById("r_pass").value}).then(({error})=>{if(error)toast(error.message);else{closeModal();toast(t("saved"))}});return}
- if(f.id==="lform"){const em=v("l_email").toLowerCase(),pw=document.getElementById("l_pass").value;
-  const ad=D.admins.find(x=>(x.email||"").toLowerCase()===em&&x.password===pw),st=D.students.find(x=>(x.email||"").toLowerCase()===em&&(x.password||"123456")===pw&&x.status!=="suspended");
-  if(ad&&(S.loginRole==="admin"||!st)){S.user={role:"admin",email:em,name:ad.name,id:"ADM"};S.dTab="overview";save();location.hash="admin"}
-  else if(st){S.user={role:"student",email:em,name:st.name,id:st.id};S.dTab="overview";save();location.hash="student"}
-  else document.getElementById("lerr").hidden=false}
  if(f.id==="eform"){delete f.dataset.tmp;const tmp=S.data.certs.findIndex(c=>c.__tmp);if(tmp>=0){delete S.data.certs[tmp].__tmp;if(f.dataset.coll==="certs"&&+f.dataset.idx===tmp){f.dataset.idx="-1";S.data.certs.splice(tmp,1)}}saveEdit(f);if(f.dataset.coll==="certs"&&+f.dataset.idx<0){S.dTab="certs";render()}}
  if(f.id==="ctform"){f.querySelectorAll("textarea[data-k]").forEach(ta=>{const k=ta.dataset.k,l=ta.dataset.l,val=ta.value;if(val===I18N[l][k])delete D.content[l][k];else D.content[l][k]=val});save();render();toast(t("saved"))}
  if(f.id==="stform"){Object.keys(D.settings).forEach(k=>{const el=document.getElementById("st_"+k);if(el&&k!=="logo"&&!k.startsWith("accr_"))D.settings[k]=el.value.trim()});const dm=document.getElementById("st_demo");if(dm)D.settings.hideDemo=!dm.checked;save();render();toast(t("saved"))}
