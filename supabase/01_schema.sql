@@ -139,8 +139,7 @@ create policy "public submit" on public.inquiries for insert to anon, authentica
   with check (length(data::text) < 8000);
 
 -- ---------- 4. First administrator ----------------------------------
--- ⚠️ Change the email below to YOUR email before running.
--- Then open the website → Sign in → Create account with this same email.
+-- Create this user in Supabase → Authentication → Users → Add user (Auto Confirm).
 insert into public.admins (id, data)
 values ('info@theifbe.com', '{"name":"IFBE Admin","email":"info@theifbe.com"}')
 on conflict (id) do nothing;

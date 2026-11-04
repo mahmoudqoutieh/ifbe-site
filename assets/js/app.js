@@ -69,6 +69,7 @@ en:{
  rights:"All rights reserved.",cancel:"Cancel",close:"Close",
  demo_dash:"Demo portal — data is stored in this browser only.",
  cpd:"CPD",acad:"Academic",cohort:"Cohort",
+ portal_soon:"Online sign-in for students and administrators opens soon. For admissions or certificate questions, contact us:",verify_soon:"Online verification opens soon. To confirm a certificate now, contact us with its number:",forms_soon:"Online forms open soon. Please email info@theifbe.com or message us on WhatsApp.",
  save_fail:"Couldn't save to the database",checking:"Checking…",net_err:"Couldn't reach the verification service. Check your connection and try again.",loading:"Loading…",
  sent_real:"Message sent. Our team will reply by email.",applied_real:"Application received. Admissions will contact you by email.",
  create_acc:"Create account",password2:"Confirm password",signup_hint:"Use the same email you registered with IFBE. Students and administrators are recognized by their email.",forgot:"Forgot password?",enter_email:"Enter your email first.",reset_sent:"Check your email for a link to set a new password.",
@@ -154,6 +155,7 @@ ar:{
  rights:"جميع الحقوق محفوظة.",cancel:"إلغاء",close:"إغلاق",
  demo_dash:"بوابة تجريبية — تُحفظ البيانات في هذا المتصفح فقط.",
  cpd:"CPD",acad:"أكاديمي",cohort:"الدفعة",
+ portal_soon:"سيتم تفعيل الدخول الإلكتروني للطلاب والإدارة قريباً. للاستفسار عن القبول أو الشهادات تواصل معنا:",verify_soon:"سيتم تفعيل التحقق الإلكتروني قريباً. للتأكد من شهادة الآن تواصل معنا مع رقمها:",forms_soon:"سيتم تفعيل النماذج الإلكترونية قريباً. راسلنا على info@theifbe.com أو عبر واتساب.",
  save_fail:"تعذّر الحفظ في قاعدة البيانات",checking:"جارٍ التحقق…",net_err:"تعذّر الوصول إلى خدمة التحقق. تأكد من الاتصال وأعد المحاولة.",loading:"جارٍ التحميل…",
  sent_real:"تم إرسال رسالتك. سيرد عليك فريقنا عبر البريد الإلكتروني.",applied_real:"تم استلام طلبك. سيتواصل معك قسم القبول عبر البريد الإلكتروني.",
  create_acc:"إنشاء حساب",password2:"تأكيد كلمة المرور",signup_hint:"استخدم نفس البريد المسجّل لدى الاتحاد. يتم التعرف على الطلاب والمشرفين من خلال البريد الإلكتروني.",forgot:"نسيت كلمة المرور؟",enter_email:"أدخل بريدك الإلكتروني أولاً.",reset_sent:"تفقد بريدك، أرسلنا رابطاً لتعيين كلمة مرور جديدة.",
@@ -173,32 +175,32 @@ ar:{
 }};
 
 const PROGRAMS_SEED=[
- {id:"CT",track:1,lvl:1,price:1900,en:"Certified Trainer",ar:"مدرب معتمد",
+ {id:"CT",track:1,lvl:1,en:"Certified Trainer",ar:"مدرب معتمد",
   den:"For professionals stepping into the educational sphere to guide, mentor, and train the next generation of beauty practitioners.",
   dar:"للمحترفين الذين ينتقلون إلى المجال التعليمي لتوجيه وتدريب الجيل القادم من ممارسي التجميل.",
   wen:"Experienced practitioners ready to teach",war:"ممارسون ذوو خبرة مستعدون للتدريس",
   oen:"Licensed to deliver accredited training",oar:"تأهيل لتقديم تدريب معتمد"},
- {id:"IET",track:1,lvl:2,price:2900,en:"International Expert Trainer",ar:"مدرب خبير دولي",
+ {id:"IET",track:1,lvl:2,en:"International Expert Trainer",ar:"مدرب خبير دولي",
   den:"An advanced credential for seasoned educators delivering world-class training and masterclasses on a global scale.",
   dar:"اعتماد متقدّم للمدربين المتمرسين الذين يقدّمون تدريباً وورش عمل احترافية على مستوى عالمي.",
   wen:"Certified trainers teaching across borders",war:"مدربون معتمدون يدرّبون على المستوى الدولي",
   oen:"International masterclass authority",oar:"صلاحية تقديم ورش احترافية دولية"},
- {id:"CC",track:2,lvl:1,price:2100,en:"Certified Consultant",ar:"مستشار معتمد",
+ {id:"CC",track:2,lvl:1,en:"Certified Consultant",ar:"مستشار معتمد",
   den:"For industry professionals providing trusted advisory, business, and strategic services to salons, clinics, and beauty brands.",
   dar:"للمحترفين الذين يقدّمون استشارات موثوقة وخدمات إدارية واستراتيجية للصالونات والعيادات وعلامات التجميل.",
   wen:"Salon & clinic owners, managers, advisors",war:"مالكو ومديرو الصالونات والعيادات والمستشارون",
   oen:"Recognized advisory practice",oar:"ممارسة استشارية معترف بها"},
- {id:"IEC",track:2,lvl:2,price:3200,en:"International Expert Consultant",ar:"مستشار خبير دولي",
+ {id:"IEC",track:2,lvl:2,en:"International Expert Consultant",ar:"مستشار خبير دولي",
   den:"A top-tier designation for consultants leading large-scale industry projects and providing expert international advisory initiatives.",
   dar:"لقب رفيع للمستشارين الذين يقودون مشاريع كبرى في القطاع ويقدّمون مبادرات استشارية دولية.",
   wen:"Consultants leading multi-site or cross-border work",war:"مستشارون يقودون مشاريع متعددة الفروع أو عابرة للحدود",
   oen:"International advisory mandate",oar:"صلاحية استشارية دولية"},
- {id:"PM",track:3,lvl:1,price:6500,en:"Professional Master's Degree",ar:"الماجستير المهني",
+ {id:"PM",track:3,lvl:1,en:"Professional Master's Degree",ar:"الماجستير المهني",
   den:"A specialized, high-level program designed to deepen industry expertise, operational knowledge, and corporate leadership capabilities.",
   dar:"برنامج متخصص رفيع المستوى لتعميق الخبرة في القطاع والمعرفة التشغيلية والقدرات القيادية المؤسسية.",
   wen:"Managers and senior practitioners",war:"المديرون والممارسون الأقدم",
   oen:"Corporate leadership qualification",oar:"مؤهل في القيادة المؤسسية"},
- {id:"PD",track:3,lvl:2,price:9800,en:"Professional Doctorate",ar:"الدكتوراه المهنية",
+ {id:"PD",track:3,lvl:2,en:"Professional Doctorate",ar:"الدكتوراه المهنية",
   den:"The pinnacle of professional achievement, awarded to pioneers, researchers, and thought leaders driving innovation across the global beauty sector.",
   dar:"قمّة الإنجاز المهني، تُمنح للروّاد والباحثين وقادة الفكر الذين يقودون الابتكار في قطاع التجميل العالمي.",
   wen:"Pioneers, researchers, thought leaders",war:"الروّاد والباحثون وقادة الفكر",
@@ -245,48 +247,14 @@ const SERVICES_SEED=[
 const SEED={
  offices:[
   {id:1,region:"americas",type:"hq",en:"Delaware",ar:"ديلاوير",cen:"United States",car:"الولايات المتحدة",x:243,y:128,coven:"North America, global coordination",covar:"أمريكا الشمالية والتنسيق العالمي",sen:"Accreditation, credentials, doctorate board",sar:"الاعتماد، الشهادات، مجلس الدكتوراه"},
-  {id:2,region:"mena",type:"reg",en:"Amman",ar:"عمّان",cen:"Jordan",car:"الأردن",x:503,y:150,coven:"Jordan, Palestine, Iraq, Lebanon, Syria",covar:"الأردن، فلسطين، العراق، لبنان، سوريا",sen:"Training cohorts, admissions, advisory",sar:"الدفعات التدريبية، القبول، الاستشارات"},
-  {id:3,region:"mena",type:"reg",en:"Riyadh",ar:"الرياض",cen:"Saudi Arabia",car:"السعودية",x:520,y:170,coven:"Saudi Arabia, Kuwait, Bahrain",covar:"السعودية، الكويت، البحرين",sen:"Training, salon & clinic advisory",sar:"التدريب، استشارات الصالونات والعيادات"},
-  {id:4,region:"mena",type:"reg",en:"Dubai",ar:"دبي",cen:"United Arab Emirates",car:"الإمارات",x:541,y:170,coven:"UAE, Qatar, Oman",covar:"الإمارات، قطر، عُمان",sen:"Masterclasses, corporate programs",sar:"ورش احترافية، برامج الشركات"},
-  {id:5,region:"mena",type:"rep",en:"Cairo",ar:"القاهرة",cen:"Egypt",car:"مصر",x:484,y:160,coven:"Egypt, North Africa",covar:"مصر وشمال أفريقيا",sen:"Admissions, verification",sar:"القبول، التحقق"},
-  {id:6,region:"europe",type:"reg",en:"London",ar:"لندن",cen:"United Kingdom",car:"المملكة المتحدة",x:400,y:100,coven:"UK, Ireland, Western Europe",covar:"بريطانيا، إيرلندا، غرب أوروبا",sen:"CPD, international trainer programs",sar:"التطوير المهني، برامج المدربين الدوليين"},
-  {id:7,region:"europe",type:"rep",en:"Istanbul",ar:"إسطنبول",cen:"Türkiye",car:"تركيا",x:479,y:124,coven:"Türkiye, Balkans, Caucasus",covar:"تركيا، البلقان، القوقاز",sen:"Training cohorts, advisory",sar:"الدفعات التدريبية، الاستشارات"},
-  {id:8,region:"asia",type:"rep",en:"Kuala Lumpur",ar:"كوالالمبور",cen:"Malaysia",car:"ماليزيا",x:680,y:215,coven:"Southeast Asia",covar:"جنوب شرق آسيا",sen:"Admissions, online programs",sar:"القبول، البرامج الإلكترونية"},
+  {id:2,region:"mena",type:"reg",en:"Amman",ar:"عمّان",cen:"Jordan",car:"الأردن",x:503,y:150,coven:"Jordan, Palestine, Iraq, Lebanon, Syria",covar:"الأردن، فلسطين، العراق، لبنان، سوريا",sen:"Training cohorts, admissions, advisory",sar:"الدفعات التدريبية، القبول، الاستشارات",phone:"+962 7 9711 1173",email:"info@theifbe.com"},
  ],
- students:[
-  {id:"S-1001",name:"Lina Haddad",email:"student@ifbe.demo",country:"Jordan",prog:"CT",status:"active",progress:68,joined:"2026-03-12"},
-  {id:"S-1002",name:"Omar Al-Khatib",email:"omar.k@example.com",country:"Saudi Arabia",prog:"CC",status:"active",progress:42,joined:"2026-04-02"},
-  {id:"S-1003",name:"Sara Mansour",email:"sara.m@example.com",country:"UAE",prog:"IET",status:"graduated",progress:100,joined:"2025-09-20"},
-  {id:"S-1004",name:"Nour El-Din",email:"nour.e@example.com",country:"Egypt",prog:"PM",status:"active",progress:25,joined:"2026-06-15"},
-  {id:"S-1005",name:"Elena Petrova",email:"elena.p@example.com",country:"United Kingdom",prog:"IEC",status:"active",progress:81,joined:"2025-11-03"},
-  {id:"S-1006",name:"Rania Saleh",email:"rania.s@example.com",country:"Kuwait",prog:"CT",status:"graduated",progress:100,joined:"2025-07-01"},
-  {id:"S-1007",name:"Dr. Huda Qasem",email:"huda.q@example.com",country:"Iraq",prog:"PD",status:"active",progress:57,joined:"2025-10-10"},
-  {id:"S-1008",name:"Aylin Demir",email:"aylin.d@example.com",country:"Türkiye",prog:"CC",status:"active",progress:12,joined:"2026-09-01"},
- ],
- certs:[
-  {no:"IFBE-2026-CT-0142",name:"Lina Haddad",prog:"CT",issued:"2026-02-20",expires:"2029-02-20",status:"valid",office:2},
-  {no:"IFBE-2025-IET-0087",name:"Sara Mansour",prog:"IET",issued:"2025-12-14",expires:"2028-12-14",status:"valid",office:4},
-  {no:"IFBE-2025-CT-0311",name:"Rania Saleh",prog:"CT",issued:"2025-10-05",expires:"2028-10-05",status:"valid",office:3},
-  {no:"IFBE-2023-CC-0056",name:"Khaled Barakat",prog:"CC",issued:"2023-01-18",expires:"2026-01-18",status:"valid",office:2},
-  {no:"IFBE-2024-CT-0219",name:"Maya Rizk",prog:"CT",issued:"2024-05-30",expires:"2027-05-30",status:"revoked",office:5},
-  {no:"IFBE-2025-PM-0012",name:"Elena Petrova",prog:"PM",issued:"2025-06-22",expires:"",status:"valid",office:6},
- ],
- apps:[
-  {id:"A-301",name:"Yasmin Tawfiq",email:"yasmin.t@example.com",country:"Palestine",prog:"CT",exp:"6",date:"2026-10-29",status:"new"},
-  {id:"A-302",name:"Fahad Al-Mutairi",email:"fahad.m@example.com",country:"Saudi Arabia",prog:"IEC",exp:"12",date:"2026-10-31",status:"new"},
-  {id:"A-303",name:"Chloe Martin",email:"chloe.m@example.com",country:"France",prog:"PM",exp:"9",date:"2026-11-01",status:"new"},
- ],
- inq:[],
- payments:[
-  {inv:"INV-2026-0451",sid:"S-1001",en:"Certified Trainer — tuition (1/2)",ar:"مدرب معتمد — الرسوم (1/2)",amt:950,date:"2026-03-12",st:"paid"},
-  {inv:"INV-2026-0598",sid:"S-1001",en:"Certified Trainer — tuition (2/2)",ar:"مدرب معتمد — الرسوم (2/2)",amt:950,date:"2026-06-12",st:"paid"},
-  {inv:"INV-2026-0877",sid:"S-1001",en:"CPD membership 2027",ar:"عضوية CPD لعام 2027",amt:180,date:"2026-12-01",st:"due"},
- ],
+ students:[],certs:[],apps:[],inq:[],payments:[],
 };
 SEED.programs=PROGRAMS_SEED;SEED.services=SERVICES_SEED;
 SEED.students.forEach(s=>s.password="123456");
-SEED.admins=[{name:"System Admin",email:"admin@ifbe.demo",password:"admin123"}];
-SEED.settings={email:"info@theifbe.com",phone:"+962 7 9711 1173",whatsapp:"+962 7 9711 1173",website:"theifbe.com",addr_en:"Wilmington, Delaware, USA",addr_ar:"ويلمنغتون، ديلاوير، الولايات المتحدة",hours_en:"Sun–Thu, 9:00–17:00",hours_ar:"الأحد–الخميس، 9:00–17:00",facebook:"",instagram:"",linkedin:"",tiktok:"",logo:"",accr_ieqm:"",accr_cpd:"",accr_iso:"",hideDemo:false};
+SEED.admins=[];
+SEED.settings={email:"info@theifbe.com",phone:"+962 7 9711 1173",whatsapp:"+962 7 9711 1173",website:"theifbe.com",addr_en:"Wilmington, Delaware, USA",addr_ar:"ويلمنغتون، ديلاوير، الولايات المتحدة",hours_en:"Sun–Thu, 9:00–17:00",hours_ar:"الأحد–الخميس، 9:00–17:00",facebook:"",instagram:"",linkedin:"",tiktok:"",logo:"",accr_ieqm:"",accr_cpd:"",accr_iso:"",hideDemo:true};
 SEED.content={en:{},ar:{}};
 Object.defineProperty(globalThis,"PROGRAMS",{get:()=>S.data.programs});
 Object.defineProperty(globalThis,"SERVICES",{get:()=>S.data.services});
@@ -295,12 +263,12 @@ const REAL=!!(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase);
 const sb=REAL?window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey):null;
 const uid=p=>p+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();
 SEED.services.forEach((x,i)=>{if(!x.id)x.id="SV-"+(i+1)});
-const SID_BY_NAME={"Lina Haddad":"S-1001","Sara Mansour":"S-1003","Rania Saleh":"S-1006","Elena Petrova":"S-1005"};
+const SID_BY_NAME={};
 SEED.certs.forEach(c=>{if(!c.sid&&SID_BY_NAME[c.name])c.sid=SID_BY_NAME[c.name]});
 SEED.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});
 /* table map: collection -> [supabase table, key field] */
 const TABLES={programs:["programs","id"],services:["services","id"],offices:["offices","id"],students:["students","id"],certs:["certificates","no"],apps:["applications","id"],inq:["inquiries","id"],payments:["payments","inv"],admins:["admins","email"]};
-const KEY="ifbe-portal-v1";
+const KEY="ifbe-site-v2";
 let S={lang:"ar",user:null,data:null,offFilter:"all",dTab:"overview",lastVerify:null,ready:!REAL,loginMode:"signin"};
 function migrate(){for(const k in SEED)if(S.data[k]==null)S.data[k]=structuredClone(SEED[k]);for(const k in SEED.settings)if(S.data.settings[k]===undefined)S.data.settings[k]=SEED.settings[k];const os=S.data.settings,ns=SEED.settings;if(os.email==="info@ifbe.org")os.email=ns.email;if(os.phone==="+1 (302) 555-0148")os.phone=ns.phone;if(os.whatsapp==="+962 7 9000 0000")os.whatsapp=ns.whatsapp;if(os.website==="www.ifbe.org")os.website=ns.website;S.data.content.en=S.data.content.en||{};S.data.content.ar=S.data.content.ar||{};S.data.students.forEach(s=>{if(!s.password)s.password="123456"});S.data.payments.forEach(p=>{if(p.sid===undefined)p.sid="S-1001"});S.data.services.forEach((x,i)=>{if(!x.id)x.id="SV-"+(i+1)});S.data.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});S.data.certs.forEach(c=>{if(!c.sid&&SID_BY_NAME[c.name])c.sid=SID_BY_NAME[c.name]})}
 function load(){try{const j=localStorage.getItem(KEY);if(j){const o=JSON.parse(j);S.data=o.data;S.lang=o.lang||"ar";S.user=o.user||null;migrate();return}}catch(e){}S.data=structuredClone(SEED)}
@@ -450,8 +418,8 @@ function certResult(no,found){
 V.verify=()=>`${pageHead("verify_title","verify_lead")}
 <section class="blk"><div class="wrap"><div class="verify-box">
  <form class="vform" id="vform"><input id="vno" autocomplete="off" placeholder="${t("verify_ph")}" value="${esc(S.lastVerify||"")}" aria-label="${t("cert_no")}"><button class="btn btn-gold" type="submit">${ICONS.verify.replace('<svg','<svg width="18" height="18"')} ${t("verify_btn")}</button></form>
- ${REAL?"":`<div class="samples"><span class="muted" style="font-size:.85rem">${t("try_sample")}</span>${["IFBE-2026-CT-0142","IFBE-2024-CT-0219","IFBE-2023-CC-0056"].map(n=>`<button type="button" class="mono" data-act="sample" data-no="${n}">${n}</button>`).join("")}</div>`}
- <div class="vres" id="vres">${REAL?(S.vfound!==undefined?certResult(S.lastVerify,S.vfound):""):certResult(S.lastVerify)}</div>
+ 
+ <div class="vres" id="vres">${REAL&&S.vfound!==undefined?certResult(S.lastVerify,S.vfound):""}</div>
 </div></div></section>`;
 
 function worldMap(list){
@@ -488,7 +456,7 @@ V.contact=()=>`${pageHead("contact_title","contact_lead")}
   <div class="two"><label class="f">${t("phone")}<input id="c_phone" type="tel"></label><label class="f">${t("office")}<select id="c_office">${S.data.offices.map(o=>`<option value="${o.id}" ${S.prefOffice==o.id?"selected":""}>${esc(L(o))} — ${esc(S.lang==="ar"?o.car:o.cen)}</option>`).join("")}</select></label></div>
   <label class="f">${t("subject")}<select id="c_subj">${["subj_adm","subj_part","subj_ver","subj_other"].map(k=>`<option value="${k}">${t(k)}</option>`).join("")}</select></label>
   <label class="f">${t("message")}<textarea id="c_msg" rows="5" required></textarea></label>
-  ${(REAL||S.data.settings.hideDemo)?"":`<p class="note">${t("demo_store")}</p>`}
+  
   <div><button class="btn btn-gold" type="submit">${t("send")}</button></div>
  </form>
  <div style="display:grid;gap:18px">
@@ -499,13 +467,7 @@ V.contact=()=>`${pageHead("contact_title","contact_lead")}
 
 V.login=()=>{
  const head=`<div style="text-align:center;margin-bottom:18px"><img src="${logo()}" alt="" style="width:76px"><h2 style="font-size:1.4rem;margin-top:8px">${t("login_title")}</h2></div>`;
- if(!REAL)return `<div class="wrap"><div class="auth"><div class="card lift" style="padding:30px">${head}
- <div class="seg"><button type="button" class="${S.loginRole!=="admin"?"on":""}" data-act="role" data-r="student">${t("student")}</button><button type="button" class="${S.loginRole==="admin"?"on":""}" data-act="role" data-r="admin">${t("admin")}</button></div>
- <form class="form" id="lform"><label class="f">${t("email")}<input id="l_email" type="email" required value="${S.loginRole==="admin"?"admin@ifbe.demo":"student@ifbe.demo"}"></label><label class="f">${t("password")}<input id="l_pass" type="password" required value=""></label>
- <p id="lerr" class="note" style="color:var(--bad)" hidden>${t("bad_login")}</p>
- <button class="btn btn-gold" type="submit">${t("signin")}</button>
- <div class="note"><b>${t("demo_creds")}</b><br>${t("student")}: <span class="mono">student@ifbe.demo / 123456</span><br>${t("admin")}: <span class="mono">admin@ifbe.demo / admin123</span></div></form>
- </div></div></div>`;
+ if(!REAL)return `<div class="wrap"><div class="auth"><div class="card lift" style="padding:30px;display:grid;gap:14px">${head}<p class="note">${t("portal_soon")}</p>${contactLines()}</div></div></div>`;
  if(S.user?.role==="pending")return `<div class="wrap"><div class="auth"><div class="card lift" style="padding:30px;display:grid;gap:14px">${head}<p class="note">${t("pending_msg")}</p><p class="mono muted" style="text-align:center">${esc(S.user.email)}</p><button class="btn btn-ghost" data-act="logout">${t("logout")}</button></div></div></div>`;
  const m=S.loginMode;
  return `<div class="wrap"><div class="auth"><div class="card lift" style="padding:30px">${head}
@@ -525,28 +487,25 @@ function dashShell(items,body){
  <div class="dash"><aside class="side"><div class="who"><div class="avatar">${initials(u.name)}</div><div><b>${esc(u.name)}</b><small>${u.role==="admin"?t("admin"):t("student")+" · "+u.id}</small></div></div>
  ${items.map(([k,ic,c,n])=>`<button type="button" class="${S.dTab===k?"on":""}" data-act="dtab" data-k="${k}">${ICONS[ic]}<span>${t(c)}</span>${n?`<span class="count num">${n}</span>`:""}</button>`).join("")}
  <div class="spacer"></div><button type="button" data-act="logout">${ICONS.out}<span>${t("logout")}</span></button></aside>
- <div class="main"><div class="inner">${(REAL||S.data.settings.hideDemo)?"":`<div class="demo-flag">${t("demo_dash")}</div>`}${body}</div></div></div>`}
+ <div class="main"><div class="inner">${body}</div></div></div>`}
 
+const stPillS=st=>`<span class="pill ${st==="graduated"?"ok":st==="suspended"?"bad":"info"}">${t(st||"active")}</span>`;
 function stuSelf(){return S.data.students.find(s=>s.id===S.user.id)||S.data.students.find(s=>s.email===S.user.email)||S.data.students[0]}
-const MODS={en:["Adult learning principles","Curriculum design","Practical demonstration skills","Assessment & feedback","Classroom management","Final teaching portfolio"],ar:["مبادئ تعليم الكبار","تصميم المنهج","مهارات العرض العملي","التقييم والتغذية الراجعة","إدارة القاعة التدريبية","ملف التدريس النهائي"]};
 V.student=()=>{
  if(!S.user||S.user.role!=="student"){location.hash="login";return""}
  const me=stuSelf(),p=prog(me.prog),myCerts=S.data.certs.filter(c=>c.sid?c.sid===me.id:c.name===me.name),myPay=S.data.payments.filter(x=>x.sid===me.id),due=myPay.filter(x=>x.st==="due").reduce((a,b)=>a+(+b.amt||0),0);
  const items=[["overview","grid","d_overview"],["programs","book","d_programs"],["certs","cert","d_certs"],["pay","card","d_pay",myPay.filter(x=>x.st==="due").length||0],["profile","user","d_profile"]];
- const mods=MODS[S.lang],doneN=Math.round(me.progress/100*mods.length);
- const course=`<div class="panel"><header><h3>${L(p)}</h3><span class="pill info">${t("cohort")} 2026-A</span></header><div class="body course">
-  <div class="top-row"><span class="muted">${t("progress")}</span><b class="num">${me.progress}%</b></div><div class="prog"><i style="width:${me.progress}%"></i></div>
-  <ul class="mod-list" style="margin-top:8px">${mods.map((m,i)=>`<li><span class="dot ${i<doneN?"done":i===doneN?"now":""}">${i<doneN?"✓":""}</span><span class="${i<doneN?"muted":""}">${m}</span></li>`).join("")}</ul></div></div>`;
+ const pr=+me.progress||0,nextP=S.data.programs.find(x=>x.track===p.track&&x.lvl===p.lvl+1);
+ const course=`<div class="panel"><header><h3>${esc(L(p))}</h3>${stPillS(me.status)}</header><div class="body course">
+  <div class="top-row"><span class="muted">${t("progress")}</span><b class="num">${pr}%</b></div><div class="prog"><i style="width:${pr}%"></i></div>
+  <p class="muted" style="margin-top:8px;font-size:.92rem">${esc(S.lang==="ar"?p.dar:p.den)}</p></div></div>`;
  const certList=myCerts.length?`<div class="grid g2">${myCerts.map(c=>{const st=certStatus(c);return `<div class="card" style="display:grid;gap:10px"><div style="display:flex;justify-content:space-between;gap:10px"><b>${L(prog(c.prog))}</b><span class="pill ${st==="valid"?"ok":st==="revoked"?"bad":"warn"}">${t(st)}</span></div><span class="mono muted">${c.no}</span><span class="muted" style="font-size:.88rem">${t("issued")}: ${fmtDate(c.issued)}</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-gold btn-sm" data-act="showcert" data-no="${c.no}">${t("view_cert")}</button><a class="btn btn-ghost btn-sm" href="#verify" data-act="gover" data-no="${c.no}">${t("verify_btn")}</a></div></div>`}).join("")}</div><p class="muted" style="font-size:.85rem">${t("download_note")}</p>`:`<p class="muted">—</p>`;
  const payTbl=`<div class="panel"><div class="tbl-wrap"><table><thead><tr><th>${t("invoice")}</th><th>${t("details")}</th><th>${t("date")}</th><th>${t("amount")}</th><th>${t("status")}</th></tr></thead><tbody>${myPay.map(x=>`<tr><td class="mono">${esc(x.inv)}</td><td>${L(x)}</td><td>${fmtDate(x.date)}</td><td class="num">${money(+x.amt||0)}</td><td><span class="pill ${x.st==="paid"?"ok":"warn"}">${t(x.st)}</span></td></tr>`).join("")}</tbody></table></div></div>`;
  let body="";
  if(S.dTab==="overview")body=`<h2>${t("welcome")}, ${esc(me.name.split(" ")[0])}</h2>
   <div class="kpis"><div class="kpi"><span>${t("active_programs")}</span><b>1</b></div><div class="kpi"><span>${t("progress")}</span><b>${me.progress}%</b></div><div class="kpi"><span>${t("certs_earned")}</span><b>${myCerts.length}</b></div><div class="kpi"><span>${t("balance")}</span><b>${money(due)}</b></div></div>
-  <div class="grid g2" style="align-items:start">${course}<div class="panel"><header><h3>${t("d_schedule")}</h3></header><div class="body"><ul class="feed">
-   <li>${ICONS.cal.replace('<svg','<svg width="18" height="18"')}<span>${S.lang==="ar"?"جلسة مباشرة: إدارة القاعة التدريبية":"Live session: Classroom management"}</span><time>${fmtDate("2026-11-08")}</time></li>
-   <li>${ICONS.file.replace('<svg','<svg width="18" height="18"')}<span>${S.lang==="ar"?"تسليم: خطة جلسة تدريبية":"Due: Training session plan"}</span><time>${fmtDate("2026-11-15")}</time></li>
-   <li>${ICONS.cal.replace('<svg','<svg width="18" height="18"')}<span>${S.lang==="ar"?"تقييم عملي — مكتب عمّان":"Practical assessment — Amman office"}</span><time>${fmtDate("2026-12-02")}</time></li></ul></div></div></div>`;
- else if(S.dTab==="programs")body=`<h2>${t("d_programs")}</h2>${course}<div class="card" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><div><b>${S.lang==="ar"?"الخطوة التالية في مسارك":"Next step on your track"}</b><p class="muted">${L(prog("IET"))}</p></div><button class="btn btn-gold btn-sm" data-act="apply" data-p="IET">${t("apply")}</button></div>`;
+  <div class="grid g2" style="align-items:start">${course}<div class="panel"><header><h3>${t("contact_title")}</h3></header><div class="body">${contactLines()}</div></div></div>`;
+ else if(S.dTab==="programs")body=`<h2>${t("d_programs")}</h2>${course}${nextP?`<div class="card" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><div><b>${S.lang==="ar"?"الخطوة التالية في مسارك":"Next step on your track"}</b><p class="muted">${esc(L(nextP))}</p></div><button class="btn btn-gold btn-sm" data-act="apply" data-p="${esc(nextP.id)}">${t("apply")}</button></div>`:""}`;
  else if(S.dTab==="certs")body=`<h2>${t("d_certs")}</h2>${certList}`;
  else if(S.dTab==="pay")body=`<h2>${t("d_pay")}</h2>${payTbl}`;
  else body=`<h2>${t("d_profile")}</h2><form class="card form" id="pform" style="max-width:640px"><div class="two"><label class="f">${t("name")}<input id="p_name" value="${esc(me.name)}"></label><label class="f">${t("email")}<input id="p_email" value="${esc(me.email)}" disabled></label></div><div class="two"><label class="f">${t("country")}<input id="p_country" value="${esc(me.country)}"></label><label class="f">${t("program")}<input value="${esc(L(p))}" disabled></label></div><div><button class="btn btn-gold" type="submit">${t("save")}</button></div></form>`;
@@ -693,7 +652,7 @@ function applyModal(pid){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">
  <div class="two"><label class="f">${t("name")}<input id="a_name" required></label><label class="f">${t("email")}<input id="a_email" type="email" required></label></div>
  <div class="two"><label class="f">${t("country")}<input id="a_country" required></label><label class="f">${t("experience")}<input id="a_exp" type="number" min="0" max="60" required></label></div>
  <label class="f">${t("specialty")}<input id="a_spec"></label>
- ${(REAL||S.data.settings.hideDemo)?"":`<p class="note">${t("demo_store")}</p>`}<div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("apply_btn")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
+ <div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("apply_btn")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
 function issueModal(sid){const st=S.data.students.find(x=>x.id===sid);const exp=new Date();exp.setFullYear(exp.getFullYear()+3);
  S.data.certs.push({__tmp:1,no:"",sid:st?.id||"",name:st?.name||"",prog:st?.prog||S.data.programs[0]?.id,office:S.data.offices[0]?.id,issued:TODAY,expires:exp.toISOString().slice(0,10),status:"valid"});
  const i=S.data.certs.length-1;editModal("certs",i);const f=document.getElementById("eform");f.dataset.tmp="1";}
@@ -782,9 +741,10 @@ document.addEventListener("input",e=>{if(e.target.id==="q"){S.q=e.target.value;c
 document.addEventListener("submit",e=>{
  e.preventDefault();const f=e.target,v=id=>document.getElementById(id).value.trim(),D=S.data;
  if(f.id==="vform"){S.lastVerify=v("vno");const box=document.getElementById("vres");
-  if(!REAL){box.innerHTML=certResult(S.lastVerify);return}
+  if(!REAL){box.innerHTML=`<div class="cert-result"><div class="bar warn">${t("verify_soon")}</div><div style="padding:16px 20px">${contactLines()}</div></div>`;return}
   if(!S.lastVerify)return;box.innerHTML=`<p class="muted">${t("checking")}</p>`;
   sb.rpc("verify_certificate",{p_no:S.lastVerify}).then(({data,error})=>{if(error){box.innerHTML=`<div class="cert-result"><div class="bar warn">${t("net_err")}</div></div>`;return}S.vfound=data||null;box.innerHTML=certResult(S.lastVerify,S.vfound)})}
+ if((f.id==="cform"||f.id==="aform")&&!REAL){closeModal();toast(t("forms_soon"));return}
  if(f.id==="cform"){D.inq.push({id:uid("Q-"),name:v("c_name"),email:v("c_email"),phone:v("c_phone"),office:+v("c_office"),subj:v("c_subj"),msg:v("c_msg"),date:TODAY,read:false});
   if(REAL){const btn=f.querySelector("[type=submit]");btn.disabled=true;sync().then(ok=>{btn.disabled=false;if(ok){f.reset();toast(t("sent_real"))}else D.inq.pop()})}else{save();f.reset();toast(t("sent_ok"))}}
  if(f.id==="aform"){D.apps.push({id:uid("A-"),name:v("a_name"),email:v("a_email"),country:v("a_country"),prog:v("a_prog"),exp:+v("a_exp"),spec:v("a_spec"),date:TODAY,status:"new"});
