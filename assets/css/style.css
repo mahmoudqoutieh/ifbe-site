@@ -412,3 +412,5 @@ html[lang="en"] .fb-text h2,html[lang="en"] .fb-text h1{font-family:var(--f-disp
 .img-up{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .img-up img{max-width:160px;max-height:110px;border-radius:8px;object-fit:cover;border:1px solid var(--line)}
 @media (prefers-reduced-motion:reduce){.gitem img{transition:none}}
+.tools .btn,.chip-btn{white-space:nowrap}
+@media (min-width:1321px) and (max-width:1560px){.nav a{padding:8px 7px;font-size:.86rem}.brand small{max-width:140px}}
