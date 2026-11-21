@@ -464,3 +464,4 @@ html[lang="en"] .fb-text h2,html[lang="en"] .fb-text h1{font-family:var(--f-disp
 html[dir="rtl"] .top::after{background:linear-gradient(-90deg,#1E6FD9 0 25%,#29A9E8 25% 50%,#F28A1B 50% 75%,#E0261B 75%)}
 .hero .accr .accr-logo{box-shadow:0 6px 18px rgba(0,0,0,.25),0 0 0 1px rgba(201,211,222,.6)}
 .seal img{filter:drop-shadow(0 20px 40px rgba(0,0,0,.45)) drop-shadow(0 0 30px rgba(92,200,245,.25))}
+.board-band{background:linear-gradient(180deg,var(--surface-2),var(--bg))}

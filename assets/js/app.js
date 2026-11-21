@@ -540,6 +540,7 @@ V.home=()=>{const posts=pubPosts().slice(0,3);return `
 <section class="blk" style="background:var(--surface-2)"><div class="wrap">${systemBlock()}</div></section>
 ${fashionBand()}
 ${leadersBlock()}
+${boardBlock()}
 ${videosBlock()}
 <section class="blk"${leadersBlock()?' style="background:var(--surface-2)"':""}><div class="wrap">
  <div class="sec-head"><div><div class="eyebrow">${t("path_eyebrow")}</div><h2>${t("path_title")}</h2></div><p class="muted">${t("path_lead")}</p></div>
@@ -566,7 +567,8 @@ V.about=()=>`${pageHead("about_title","about_lead")}
  <div class="card" style="padding:28px">${systemBlock()}</div>
  <div><div class="sec-head"><div><div class="eyebrow">${t("accr_eyebrow")}</div><h2>${t("accr_title")}</h2></div></div>${accrCards()}</div>
 </div></section>
-${leadersBlock()}`;
+${leadersBlock()}
+${boardBlock()}`;
 
 V.programs=()=>`${pageHead("prog_title","prog_lead")}
 <section class="blk"><div class="wrap" style="display:grid;gap:44px">
@@ -587,7 +589,7 @@ V.directory=()=>{
  return `${pageHead("dir_title","dir_lead")}
 <section class="blk"><div class="wrap">
  <div class="tabs">${PCATS.map(k=>`<button type="button" class="${k===c?"on":""}" data-act="dircat" data-c="${k}">${t("cat_"+k)} <span class="num" style="opacity:.7">${(S.data.people||[]).filter(p=>p.cat===k).length}</span></button>`).join("")}</div>
- ${c==="leader"?`<p class="muted" style="max-width:70ch;margin-bottom:20px">${t("leaders_lead")}</p>`:""}
+ ${c==="leader"?`<p class="muted" style="max-width:70ch;margin-bottom:20px">${t("leaders_lead")}</p>`:c==="board"?`<p class="muted" style="max-width:70ch;margin-bottom:20px">${t("board_lead")}</p>`:""}
  <div class="dir-tools"><input class="search" id="dq" placeholder="${t("dir_search")}" value="${esc(S.dq||"")}">
   ${ranks.length>1?`<div class="chips">${["all",...ranks].map(r=>`<button type="button" class="${r===rk?"on":""}" data-act="drank" data-r="${r}">${r==="all"?t("all_ranks"):t("rank_"+r)}</button>`).join("")}</div>`:""}</div>
  ${list.length?`<div class="people">${list.map(p=>personCard(p,c==="leader"&&(p.rank==="global_president"||p.rank==="global_vp"))).join("")}</div>`:`<div class="empty">${ico("users",34)}<p>${t("dir_empty")}</p></div>`}
@@ -666,6 +668,9 @@ Object.assign(I18N.en,{
  presenter:"Presenter",video_link:"Video link (YouTube, Vimeo or .mp4)",videos_empty:"No videos have been published yet.",intro_title:"Get to know the Federation",latest_videos:"Latest videos",all_videos:"All videos",member_videos:"Videos",none:"—",
  cd_certificate:"Professional Certificate",cd_accreditation:"Certificate of Accreditation",cd_membership:"Certificate of Membership",cd_presidency:"Certificate of Presidency",
  g_members:"Members & videos",
+ cat_board:"Global Board of Directors",board_title:"Members of the Global Board of Directors",board_lead:"The Global Board of Directors sets the Federation's direction, approves its standards and oversees its work across countries.",
+ rank_board_chair:"Chair of the Global Board",rank_board_member:"Member of the Global Board",
+ kind_board:"Board membership certificate",cd_board:"شهادة عضوية مجلس الإدارة العالمي",
 });
 Object.assign(I18N.ar,{
  nav_directory:"الأعضاء",cta_directory:"الأعضاء",dir_title:"الأعضاء",dir_lead:"الرؤساء والرؤساء السابقون، والمدربون والمستشارون، وحملة الدبلوم والدكتوراه المهنية، وجميع أعضاء الاتحاد.",
@@ -686,16 +691,19 @@ Object.assign(I18N.ar,{
  presenter:"المحاضر / المقدّم",video_link:"رابط الفيديو (YouTube أو Vimeo أو mp4)",videos_empty:"لم يُنشر أي فيديو بعد.",intro_title:"تعرّف على الاتحاد",latest_videos:"أحدث الفيديوهات",all_videos:"كل الفيديوهات",member_videos:"فيديوهات",none:"—",
  cd_certificate:"شهادة مهنية",cd_accreditation:"شهادة اعتماد",cd_membership:"شهادة عضوية",cd_presidency:"شهادة رئاسة",
  g_members:"الأعضاء والفيديوهات",
+ cat_board:"مجلس الإدارة العالمي",board_title:"أعضاء مجلس الإدارة العالمي للاتحاد",board_lead:"يتولى مجلس الإدارة العالمي رسم توجهات الاتحاد واعتماد معاييره والإشراف على أعماله في مختلف الدول.",
+ rank_board_chair:"رئيس مجلس الإدارة العالمي",rank_board_member:"عضو مجلس الإدارة العالمي",
+ kind_board:"شهادة عضوية مجلس الإدارة",cd_board:"شهادة عضوية مجلس الإدارة العالمي",
 });
-PCATS.splice(0,PCATS.length,"leader","former","trainer","consultant","graduate","member");
-RANKS.former=["former_president"];
-RANK_ORDER.splice(0,RANK_ORDER.length,...["leader","former","trainer","consultant","graduate","member"].flatMap(c=>RANKS[c]));
-const CKINDS=["certificate","accreditation","membership","presidency"];
+PCATS.splice(0,PCATS.length,"leader","board","former","trainer","consultant","graduate","member");
+RANKS.former=["former_president"];RANKS.board=["board_chair","board_member"];
+RANK_ORDER.splice(0,RANK_ORDER.length,...["leader","board","former","trainer","consultant","graduate","member"].flatMap(c=>RANKS[c]));
+const CKINDS=["certificate","accreditation","membership","presidency","board"];
 const VCATS=["intro","lecture","workshop","event","interview"];
-const kindForCat=c=>({leader:"presidency",former:"presidency",member:"membership",trainer:"accreditation",consultant:"accreditation"})[c]||"certificate";
+const kindForCat=c=>({board:"board",leader:"presidency",former:"presidency",member:"membership",trainer:"accreditation",consultant:"accreditation"})[c]||"certificate";
 const person=id=>(S.data.people||[]).find(p=>String(p.id)===String(id));
 const pname=p=>p?LX(p,"en","ar"):"";
-function certLabel(c){if(LX(c,"cten","ctar"))return LX(c,"cten","ctar");if(c.prog){const p=S.data.programs.find(x=>x.id===c.prog);if(p)return L(p)}return t("kind_"+(c.kind||"certificate"))}
+function certLabel(c){if(LX(c,"cten","ctar"))return LX(c,"cten","ctar");if(c.prog){const p=S.data.programs.find(x=>x.id===c.prog);if(p)return L(p)}if(c.kind==="board")return t("rank_board_member");return t("kind_"+(c.kind||"certificate"))}
 function photoBox(p,cls){const nm=pname(p);return p&&p.photo?`<img class="${cls}" src="${esc(p.photo)}" alt="${esc(nm)}" loading="lazy">`:`<span class="${cls} ph-i"><span>${esc(initials(nm||"?"))}</span></span>`}
 const trainees=()=>S.data.trainees||[];
 const traineesOf=id=>trainees().filter(x=>String(x.trainer)===String(id)).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
@@ -705,7 +713,7 @@ function vThumb(v){const y=ytId(v.url);return v.thumb||(y?`https://img.youtube.c
 /* portrait member card (whole card opens the profile) */
 personCard=function(p,big){const tr=p.cat==="trainer"?traineesOf(p.id).length:0;
  return `<a class="card mcard${big?" big":""}" href="#m-${esc(p.id)}">${photoBox(p,"mphoto")}
- <span class="mbody"><span class="pill ${p.cat==="leader"?"hq":p.cat==="former"?"warn":"info"}">${t("rank_"+p.rank)}</span>
+ <span class="mbody"><span class="pill ${p.cat==="leader"||p.cat==="board"?"hq":p.cat==="former"?"warn":"info"}">${t("rank_"+p.rank)}</span>
  <b class="mname">${esc(pname(p))}</b>
  ${LX(p,"ten","tar")?`<span class="muted mtitle">${esc(LX(p,"ten","tar"))}</span>`:""}
  <span class="mmeta">${LX(p,"cen","car")?`<span>${ico("globe",14)} ${esc(LX(p,"cen","car"))}</span>`:""}${tr?`<span>${ico("users",14)} ${tr} ${t("n_trainees")}</span>`:""}</span></span></a>`};
@@ -741,7 +749,7 @@ V.member=()=>{const id=decodeURIComponent(location.hash.slice(3)),p=person(id);
  return `<div class="page-head"><div class="wrap"><div class="crumbs"><a href="#home">${t("nav_home")}</a> / <a href="#directory" data-act="dircat" data-c="${esc(p.cat)}">${t("nav_directory")}</a> / ${esc(t("cat_"+p.cat))}</div></div></div>
 <section class="blk mprofile"><div class="wrap mp-grid">
  <div class="mp-photo">${photoBox(p,"mp-img")}</div>
- <div class="mp-info"><span class="pill ${p.cat==="leader"?"hq":p.cat==="former"?"warn":"info"}">${t("rank_"+p.rank)}</span>
+ <div class="mp-info"><span class="pill ${p.cat==="leader"||p.cat==="board"?"hq":p.cat==="former"?"warn":"info"}">${t("rank_"+p.rank)}</span>
   <h1>${esc(pname(p))}</h1>
   ${LX(p,"ten","tar")?`<p class="mp-title">${esc(LX(p,"ten","tar"))}</p>`:""}
   <div class="mmeta" style="font-size:.95rem">${LX(p,"cen","car")?`<span>${ico("globe",16)} ${esc(LX(p,"cen","car"))}</span>`:""}${trs.length?`<span>${ico("users",16)} ${trs.length} ${t("n_trainees")}</span>`:""}${vids.length?`<span>${ico("play",14)} ${vids.length} ${t("member_videos")}</span>`:""}</div>
@@ -769,6 +777,10 @@ V.directory=()=>{
   ${ranks.length>1?`<div class="chips">${["all",...ranks].map(r=>`<button type="button" class="${r===rk?"on":""}" data-act="drank" data-r="${r}">${r==="all"?t("all_ranks"):t("rank_"+r)}</button>`).join("")}</div>`:""}</div>
  ${list.length?`<div class="mgrid">${list.map(p=>personCard(p,c==="leader"&&(p.rank==="global_president"||p.rank==="global_vp"))).join("")}</div>`:`<div class="empty">${ico("users",34)}<p>${t("dir_empty")}</p></div>`}
 </div></section>`};
+function boardBlock(){const list=sortPeople((S.data.people||[]).filter(p=>p.cat==="board"));if(!list.length)return"";
+ return `<section class="blk board-band"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("cat_board")}</div><h2>${t("board_title")}</h2></div><p class="muted">${t("board_lead")}</p></div>
+ <div class="mgrid">${list.slice(0,8).map(p=>personCard(p,p.rank==="board_chair")).join("")}</div>
+ ${list.length>8?`<div style="margin-top:22px"><a class="btn btn-ghost" href="#directory" data-act="dircat" data-c="board">${t("cat_board")}</a></div>`:""}</div></section>`}
 leadersBlock=function(){const top=sortPeople((S.data.people||[]).filter(p=>p.cat==="leader")).slice(0,4);if(!top.length)return"";
  return `<section class="blk"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("leaders_eyebrow")}</div><h2>${t("leaders_title")}</h2></div><p class="muted">${t("leaders_lead")}</p></div>
  <div class="mgrid lead">${top.map(p=>personCard(p,true)).join("")}</div>
@@ -885,7 +897,7 @@ const SCHEMA={
  students:{title:"a_students",f:[F("id","ID"),F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1}),F("country","country"),F("prog","program","prog"),F("status","status","select",["active","graduated","suspended"]),F("progress","progress","number"),F("joined","date","date")],
   auto:it=>{if(!it.id)it.id=uid("S-");if(!it.joined)it.joined=TODAY}},
  certs:{title:"a_certs",f:[F("kind","kind","select",CKINDS,"ckind"),F("no","cert_no","text",0,0,{dir:"ltr"}),F("sid","member","member"),F("name","holder","text",0,0,{req:1}),F("prog","program","prog",0,0,{opt0:1}),F("ctar","cert_title_ar","text",0,0,{dir:"rtl"}),F("cten","cert_title_en","text",0,0,{dir:"ltr"}),F("office","office","office"),F("issued","issued","date"),F("expires","expires","date"),F("status","status","select",["valid","revoked"])],
-  auto:it=>{if(!it.no)it.no=nextCertNo(it.prog||({accreditation:"ACC",membership:"MEM",presidency:"PRS"})[it.kind],it.issued);if(!it.issued)it.issued=TODAY;if(it.sid&&!it.name){const st=person(it.sid);if(st)it.name=pname(st)}}},
+  auto:it=>{if(!it.no)it.no=nextCertNo(it.prog||({accreditation:"ACC",membership:"MEM",presidency:"PRS",board:"BRD"})[it.kind],it.issued);if(!it.issued)it.issued=TODAY;if(it.sid&&!it.name){const st=person(it.sid);if(st)it.name=pname(st)}}},
  programs:{title:"a_programs",f:[F("id","code","text",0,0,{req:1}),F("track","track","select",[1,2,3],"track"),F("lvl","lvl","number"),F("price","price","number"),F("en","name_en","text",0,0,{req:1,dir:"ltr"}),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("den","desc_en","textarea",0,0,{dir:"ltr"}),F("dar","desc_ar","textarea",0,0,{dir:"rtl"}),F("wen","who_en","text",0,0,{dir:"ltr"}),F("war","who_ar","text",0,0,{dir:"rtl"}),F("oen","out_en","text",0,0,{dir:"ltr"}),F("oar","out_ar","text",0,0,{dir:"rtl"})]},
  services:{title:"a_services",auto:it=>{it.id=uid("SV-")},f:[F("ic","icon","select",["train","cert","strat","salon","lead","cpd","verify","book","users","cal","globe","star","sparkle","hanger","brush","scissors","drop","news"],"raw"),F("en","name_en","text",0,0,{req:1,dir:"ltr"}),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("den","desc_en","textarea",0,0,{dir:"ltr"}),F("dar","desc_ar","textarea",0,0,{dir:"rtl"}),F("len","list_en","lines",0,0,{dir:"ltr"}),F("lar","list_ar","lines",0,0,{dir:"rtl"})]},
  offices:{title:"a_offices",f:[F("en","city_en","text",0,0,{req:1,dir:"ltr"}),F("ar","city_ar","text",0,0,{req:1,dir:"rtl"}),F("cen","country_en","text",0,0,{dir:"ltr"}),F("car","country_ar","text",0,0,{dir:"rtl"}),F("region","region","select",["americas","mena","europe","asia"]),F("type","type","select",["hq","reg","rep"],"otype"),F("phone","phone","text",0,0,{dir:"ltr"}),F("email","email","text",0,0,{dir:"ltr"}),F("coven","covers_en","text",0,0,{dir:"ltr"}),F("covar","covers_ar","text",0,0,{dir:"rtl"}),F("sen","services_en","text",0,0,{dir:"ltr"}),F("sar","services_ar","text",0,0,{dir:"rtl"}),F("x","map_x","number"),F("y","map_y","number")],
@@ -956,7 +968,7 @@ const CGROUPS=[
  ["g_quals",["quals_eyebrow","quals_title","quals_lead","q1","q2","q3","q4","q5","quals_note"]],
  ["g_fashion",["nav_fashion","fash_eyebrow","fash_title","fash_lead","fash_p1","fash_p1d","fash_p2","fash_p2d","fash_p3","fash_p3d","fash_cta","fash_cta2","fash_cta2d","gallery_eyebrow","gallery_title"]],
  ["g_dir",["leaders_eyebrow","leaders_title","leaders_lead","dir_title","dir_lead","cat_leader","cat_trainer","cat_consultant","cat_graduate","cat_member","news_title","news_lead"]],
- ["g_members",["nav_directory","dir_title","dir_lead","cat_leader","cat_former","cat_trainer","cat_consultant","cat_graduate","cat_member","nav_videos","videos_title","videos_lead","intro_title"]],
+ ["g_members",["nav_directory","dir_title","dir_lead","cat_leader","cat_board","board_title","board_lead","cat_former","cat_trainer","cat_consultant","cat_graduate","cat_member","nav_videos","videos_title","videos_lead","intro_title"]],
  ["g_accr",["ieqm_t","ieqm_d","cpd_t","cpd_d","iso_t","iso_d"]],
  ["g_pages",["prog_title","prog_lead","svc_page_lead","verify_title","verify_lead","offices_title","offices_lead","contact_title","contact_lead"]],
  ["g_general",["fullName","footer_about","track_trainer","track_consult","track_acad","nav_home","nav_about","nav_programs","nav_services","nav_verify","nav_offices","nav_contact","nav_directory","nav_news","cta_directory"]],
@@ -1048,8 +1060,8 @@ V.admin=()=>{
 function modal(html){const r=document.getElementById("modalRoot");r.innerHTML=`<div class="modal" data-act="mclose"><div class="box" onclick="event.stopPropagation()"><button class="x" type="button" data-act="mclose" aria-label="${t("close")}">✕</button>${html}</div></div>`}
 function closeModal(){document.getElementById("modalRoot").innerHTML=""}
 function certDoc(c){const k=c.kind||"certificate",ttl=certLabel(c),p=c.prog?S.data.programs.find(x=>x.id===c.prog):null,tEn=c.cten||(p?p.en:""),tAr=c.ctar||(p?p.ar:"");
- const line={certificate:"has fulfilled all requirements and is hereby awarded",accreditation:"is hereby accredited as",membership:"is hereby admitted as a member of the Federation",presidency:"is hereby appointed as"}[k];
- const kEn={certificate:"Professional Certificate",accreditation:"Certificate of Accreditation",membership:"Certificate of Membership",presidency:"Certificate of Presidency"}[k];
+ const line={certificate:"has fulfilled all requirements and is hereby awarded",accreditation:"is hereby accredited as",membership:"is hereby admitted as a member of the Federation",presidency:"is hereby appointed as",board:"is hereby appointed a member of the Global Board of Directors"}[k];
+ const kEn={certificate:"Professional Certificate",accreditation:"Certificate of Accreditation",membership:"Certificate of Membership",presidency:"Certificate of Presidency",board:"Board Membership Certificate"}[k];
  return `<div class="certdoc"><img src="${logo()}" alt=""><div class="t">International Federation of Beauty Experts</div><div class="kd">${kEn} · ${I18N.ar["cd_"+k]}</div><div class="s">This is to certify that</div><div class="n">${esc(c.name)}</div><div class="s">${line}</div>${tEn||tAr?`<div class="p">${esc([tEn,tAr].filter(Boolean).join(" · "))}</div>`:""}<div class="seals">${ACCR_KEYS.map(k=>`<img src="${accrLogo(k)}" alt="">`).join("")}</div><div class="foot"><div><b>${esc(c.no)}</b>Verify at ${esc((S.data.settings.website||"theifbe.com").replace(/^https?:\/\//,""))}</div><div style="text-align:end"><b>${c.issued?fmtDate(c.issued):"—"}</b>Date of issue</div></div></div>`}
 function applyModal(pid){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">${t("apply_title")}</h2><form class="form" id="aform">
  <label class="f">${t("program")}<select id="a_prog">${PROGRAMS.map(p=>`<option value="${p.id}" ${p.id===pid?"selected":""}>${L(p)}</option>`).join("")}</select></label>
@@ -1058,7 +1070,7 @@ function applyModal(pid){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">
  <label class="f">${t("specialty")}<input id="a_spec"></label>
  <div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("apply_btn")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
 function issueModal(pid){const p=person(pid),st=(S.data.students||[]).find(x=>x.id===pid),k=kindForCat(p?.cat);const exp=new Date();exp.setFullYear(exp.getFullYear()+3);
- S.data.certs.push({__tmp:1,kind:k,no:p&&p.certno&&!S.data.certs.some(c=>c.no===p.certno)?p.certno:"",sid:p?.id||"",name:pname(p),prog:st?.prog||"",ctar:k==="presidency"||k==="membership"?(p?.tar||""):"",cten:k==="presidency"||k==="membership"?(p?.ten||""):"",office:S.data.offices[0]?.id,issued:TODAY,expires:k==="presidency"||k==="membership"?"":exp.toISOString().slice(0,10),status:"valid"});
+ S.data.certs.push({__tmp:1,kind:k,no:p&&p.certno&&!S.data.certs.some(c=>c.no===p.certno)?p.certno:"",sid:p?.id||"",name:pname(p),prog:st?.prog||"",ctar:k==="presidency"||k==="membership"||k==="board"?(p?.tar||""):"",cten:k==="presidency"||k==="membership"||k==="board"?(p?.ten||""):"",office:S.data.offices[0]?.id,issued:TODAY,expires:k==="presidency"||k==="membership"||k==="board"?"":exp.toISOString().slice(0,10),status:"valid"});
  const i=S.data.certs.length-1;editModal("certs",i);const f=document.getElementById("eform");f.dataset.tmp="1";}
 function stuModal(){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">${t("add_student")}</h2><form class="form" id="sform"><div class="two"><label class="f">${t("name")}<input id="s_name" required></label><label class="f">${t("email")}<input id="s_email" type="email" required></label></div><div class="two"><label class="f">${t("country")}<input id="s_country" required></label><label class="f">${t("program")}<select id="s_prog">${PROGRAMS.map(p=>`<option value="${p.id}">${L(p)}</option>`).join("")}</select></label></div><div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("add_student")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
 function offModal(){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">${t("add_office")}</h2><form class="form" id="oform"><div class="two"><label class="f">${t("city")} (EN)<input id="o_en" required></label><label class="f">${t("city")} (AR)<input id="o_ar" required dir="rtl"></label></div><div class="two"><label class="f">${t("country")} (EN)<input id="o_cen" required></label><label class="f">${t("country")} (AR)<input id="o_car" required dir="rtl"></label></div><div class="two"><label class="f">${t("region")}<select id="o_reg">${["americas","mena","europe","asia"].map(r=>`<option value="${r}">${t(r)}</option>`).join("")}</select></label><label class="f">${t("type")}<select id="o_type"><option value="reg">${t("regional")}</option><option value="rep">${t("rep")}</option></select></label></div><div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("add_office")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
