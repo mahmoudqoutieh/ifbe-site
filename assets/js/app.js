@@ -525,7 +525,7 @@ function bodyHtml(txt){return String(txt||"").split(/\n\s*\n/).map(par=>par.trim
 /* ---------- pages ---------- */
 V.home=()=>{const posts=pubPosts().slice(0,3);return `
 <section class="hero"><canvas id="globe"></canvas><div class="wrap">
- <div><div class="eyebrow" style="color:#E7BE5C">${t("hero_eyebrow")}</div>
+ <div><div class="eyebrow" style="color:#5CC8F5">${t("hero_eyebrow")}</div>
   <h1 style="margin-top:12px">${t("hero_title")}</h1>
   <p class="lead">${t("hero_lead")}</p>
   <div class="ctas"><a class="btn btn-gold" href="#programs">${t("cta_programs")}</a><a class="btn btn-ghost-light" href="#directory">${t("cta_directory")}</a><a class="btn btn-ghost-light" href="#verify">${t("cta_verify")}</a></div>
@@ -619,22 +619,22 @@ V.post=()=>{const id=location.hash.slice(6);const p=(S.data.posts||[]).find(x=>S
 const GCATS=["fashion_design","fashion_show","makeup","hair","skin","event"];
 const galleryItems=()=>(S.data.gallery||[]).slice().sort((a,b)=>((+a.order||999)-(+b.order||999)));
 function galleryGrid(list){return `<div class="gallery">${list.map((g,i)=>`<button type="button" class="gitem" data-act="lightbox" data-id="${esc(g.id)}"><img src="${esc(g.img)}" alt="${esc(LX(g,"en","ar"))}" loading="lazy"><span class="gcap"><b>${esc(LX(g,"en","ar"))}</b><small>${t("gcat_"+g.cat)}</small></span></button>`).join("")}</div>`}
-function fashionArt(){return `<div class="fart" aria-hidden="true"><svg viewBox="0 0 400 440"><defs><linearGradient id="fg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7BE5C"/><stop offset="1" stop-color="#C08A1E"/></linearGradient></defs>
+function fashionArt(){return `<div class="fart" aria-hidden="true"><svg viewBox="0 0 400 440"><defs><linearGradient id="fg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC8F5"/><stop offset="1" stop-color="#29A9E8"/></linearGradient></defs>
  <path d="M200 40c10 0 18 8 18 18s-8 18-18 18" fill="none" stroke="url(#fg1)" stroke-width="5" stroke-linecap="round"/>
  <path d="M200 76v22L70 190h260L200 98" fill="none" stroke="url(#fg1)" stroke-width="5" stroke-linejoin="round"/>
- <path d="M150 205h100l40 215H110z" fill="rgba(231,190,92,.12)" stroke="url(#fg1)" stroke-width="3"/>
- <path d="M150 205c15 30 85 30 100 0M130 300h140M120 360h160" fill="none" stroke="rgba(231,190,92,.55)" stroke-width="2"/>
- <circle cx="200" cy="250" r="5" fill="#E7BE5C"/><circle cx="200" cy="275" r="5" fill="#E7BE5C"/></svg></div>`}
+ <path d="M150 205h100l40 215H110z" fill="rgba(92,200,245,.12)" stroke="url(#fg1)" stroke-width="3"/>
+ <path d="M150 205c15 30 85 30 100 0M130 300h140M120 360h160" fill="none" stroke="rgba(92,200,245,.55)" stroke-width="2"/>
+ <circle cx="200" cy="250" r="5" fill="#5CC8F5"/><circle cx="200" cy="275" r="5" fill="#5CC8F5"/></svg></div>`}
 function fashionBand(){const feat=galleryItems().filter(g=>g.featured!=="no").slice(0,5);
  return `<section class="fashion-band"><div class="wrap fb-grid">
- <div class="fb-text"><div class="eyebrow" style="color:#E7BE5C">${t("fash_eyebrow")}</div><h2>${t("fash_title")}</h2><p>${t("fash_lead")}</p>
+ <div class="fb-text"><div class="eyebrow" style="color:#5CC8F5">${t("fash_eyebrow")}</div><h2>${t("fash_title")}</h2><p>${t("fash_lead")}</p>
   <div class="fb-pillars">${[1,2,3].map(i=>`<div><b>${t("fash_p"+i)}</b><span>${t("fash_p"+i+"d")}</span></div>`).join("")}</div>
   <a class="btn btn-gold" href="#fashion" style="margin-top:24px">${t("fash_cta")}</a></div>
  ${feat.length?`<div class="fb-mosaic n${feat.length}">${feat.map(g=>`<button type="button" class="gitem" data-act="lightbox" data-id="${esc(g.id)}"><img src="${esc(g.img)}" alt="${esc(LX(g,"en","ar"))}" loading="lazy"></button>`).join("")}</div>`:fashionArt()}
  </div></section>`}
 V.fashion=()=>{const f=S.gf||"all",list=galleryItems().filter(g=>f==="all"||g.cat===f),cats=GCATS.filter(c=>galleryItems().some(g=>g.cat===c));
  return `<section class="fashion-band fashion-hero"><div class="wrap fb-grid">
- <div class="fb-text"><div class="crumbs"><a href="#home">${t("nav_home")}</a> / ${t("nav_fashion")}</div><div class="eyebrow" style="color:#E7BE5C;margin-top:10px">${t("fash_eyebrow")}</div><h1>${t("fash_title")}</h1><p>${t("fash_lead")}</p></div>
+ <div class="fb-text"><div class="crumbs"><a href="#home">${t("nav_home")}</a> / ${t("nav_fashion")}</div><div class="eyebrow" style="color:#5CC8F5;margin-top:10px">${t("fash_eyebrow")}</div><h1>${t("fash_title")}</h1><p>${t("fash_lead")}</p></div>
  ${fashionArt()}</div></section>
 <section class="blk"><div class="wrap" style="display:grid;gap:34px">
  <div class="grid g3">${[1,2,3].map(i=>`<div class="card fp"><span class="ico">${ico(["hanger","star","sparkle"][i-1],22)}</span><h3>${t("fash_p"+i)}</h3><p class="muted">${t("fash_p"+i+"d")}</p></div>`).join("")}</div>
@@ -792,7 +792,7 @@ V.verify=()=>`${pageHead("verify_title","verify_lead")}
 
 function worldMap(list){
  // simplified continents as soft ellipses + office pins on an equirectangular 800x360 frame
- const pins=list.map(o=>`<g><circle cx="${o.x}" cy="${o.y}" r="${o.type==="hq"?9:6}" fill="${o.type==="hq"?"#C42B1F":"#E7BE5C"}" stroke="#071C46" stroke-width="2"/>${o.type==="hq"?`<circle cx="${o.x}" cy="${o.y}" r="16" fill="none" stroke="#C42B1F" stroke-width="1.5" opacity=".5"/>`:""}<text x="${o.x}" y="${o.y-13}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--fg)">${esc(L(o))}</text></g>`).join("");
+ const pins=list.map(o=>`<g><circle cx="${o.x}" cy="${o.y}" r="${o.type==="hq"?9:6}" fill="${o.type==="hq"?"#C42B1F":"#5CC8F5"}" stroke="#06235C" stroke-width="2"/>${o.type==="hq"?`<circle cx="${o.x}" cy="${o.y}" r="16" fill="none" stroke="#C42B1F" stroke-width="1.5" opacity=".5"/>`:""}<text x="${o.x}" y="${o.y-13}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--fg)">${esc(L(o))}</text></g>`).join("");
  return `<div class="map"><div style="overflow-x:auto"><svg viewBox="0 0 800 330" style="min-width:560px" role="img" aria-label="${t("offices_title")}">
  <rect width="800" height="330" fill="var(--surface-2)"/>
  <g fill="color-mix(in srgb,var(--royal) 22%,var(--surface))" stroke="color-mix(in srgb,var(--royal) 35%,var(--surface))">
@@ -1097,11 +1097,11 @@ function drawGlobe(){
  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;let rot=0;
  function frame(){const w=c.width=c.offsetWidth*devicePixelRatio,h=c.height=c.offsetHeight*devicePixelRatio;x.clearRect(0,0,w,h);
   const R=Math.max(w,h)*.55,cx=S.lang==="ar"?w*.12:w*.88,cy=h*.55;x.lineWidth=1*devicePixelRatio;
-  x.strokeStyle="rgba(231,190,92,.22)";
+  x.strokeStyle="rgba(92,200,245,.22)";
   for(let i=-60;i<=60;i+=20){const yy=cy-R*Math.sin(i*Math.PI/180),rr=R*Math.cos(i*Math.PI/180);x.beginPath();x.ellipse(cx,yy,rr,rr*.18,0,0,Math.PI*2);x.stroke()}
   x.strokeStyle="rgba(140,175,255,.18)";
   for(let m=0;m<180;m+=20){const a=(m+rot)*Math.PI/180;x.beginPath();x.ellipse(cx,cy,Math.abs(R*Math.cos(a)),R,0,0,Math.PI*2);x.stroke()}
-  x.strokeStyle="rgba(231,190,92,.35)";x.beginPath();x.arc(cx,cy,R,0,Math.PI*2);x.stroke();
+  x.strokeStyle="rgba(92,200,245,.35)";x.beginPath();x.arc(cx,cy,R,0,Math.PI*2);x.stroke();
   if(!reduce){rot=(rot+.05)%360;raf=requestAnimationFrame(frame)}}
  frame()}
 
