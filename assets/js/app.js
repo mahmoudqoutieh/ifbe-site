@@ -370,8 +370,8 @@ const SID_BY_NAME={};
 SEED.certs.forEach(c=>{if(!c.sid&&SID_BY_NAME[c.name])c.sid=SID_BY_NAME[c.name]});
 SEED.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});
 /* table map: collection -> [supabase table, key field] */
-const TABLES={programs:["programs","id"],services:["services","id"],offices:["offices","id"],students:["students","id"],certs:["certificates","no"],apps:["applications","id"],inq:["inquiries","id"],payments:["payments","inv"],admins:["admins","email"],people:["people","id"],posts:["posts","id"],gallery:["gallery","id"]};
-SEED.people=[];SEED.posts=[];SEED.gallery=[];
+const TABLES={programs:["programs","id"],services:["services","id"],offices:["offices","id"],students:["students","id"],certs:["certificates","no"],apps:["applications","id"],inq:["inquiries","id"],payments:["payments","inv"],admins:["admins","email"],people:["people","id"],posts:["posts","id"],gallery:["gallery","id"],trainees:["trainees","id"],videos:["videos","id"]};
+SEED.people=[];SEED.posts=[];SEED.gallery=[];SEED.trainees=[];SEED.videos=[];
 const KEY="ifbe-site-v2";
 let S={lang:"ar",user:null,data:null,offFilter:"all",dTab:"overview",lastVerify:null,ready:!REAL,loginMode:"signin"};
 function migrate(){for(const k in SEED)if(S.data[k]==null)S.data[k]=structuredClone(SEED[k]);for(const k in SEED.settings)if(S.data.settings[k]===undefined)S.data.settings[k]=SEED.settings[k];const os=S.data.settings,ns=SEED.settings;if(os.email==="info@ifbe.org")os.email=ns.email;if(os.phone==="+1 (302) 555-0148")os.phone=ns.phone;if(os.whatsapp==="+962 7 9000 0000")os.whatsapp=ns.whatsapp;if(os.website==="www.ifbe.org")os.website=ns.website;S.data.content.en=S.data.content.en||{};S.data.content.ar=S.data.content.ar||{};S.data.payments.forEach(p=>{if(p.sid===undefined)p.sid="S-1001"});S.data.services.forEach((x,i)=>{if(!x.id)x.id="SV-"+(i+1)});S.data.inq.forEach(q=>{if(!q.id)q.id=uid("Q-")});S.data.certs.forEach(c=>{if(!c.sid&&SID_BY_NAME[c.name])c.sid=SID_BY_NAME[c.name]})}
@@ -382,7 +382,7 @@ function save(){
 
 /* ---------- Supabase backend ---------- */
 let SNAP={};
-function emptyData(){return {people:[],posts:[],gallery:[],programs:[],services:[],offices:[],students:[],certs:[],apps:[],inq:[],payments:[],admins:[],settings:structuredClone(SEED.settings),content:{en:{},ar:{}}}}
+function emptyData(){return {trainees:[],videos:[],people:[],posts:[],gallery:[],programs:[],services:[],offices:[],students:[],certs:[],apps:[],inq:[],payments:[],admins:[],settings:structuredClone(SEED.settings),content:{en:{},ar:{}}}}
 function snap(){SNAP={};for(const c in TABLES){const k=TABLES[c][1];SNAP[c]=new Map((S.data[c]||[]).map(r=>[String(r[k]),JSON.stringify(r)]))}SNAP._cfg={settings:JSON.stringify(S.data.settings),content:JSON.stringify(S.data.content)}}
 async function sync(){
  if(!REAL)return true;
@@ -400,8 +400,8 @@ async function sync(){
  snap();return true}
 async function fetchColl(c){const {data,error}=await sb.from(TABLES[c][0]).select("id,data").order("created_at",{ascending:true});if(error){console.error(c,error);return[]}return data.map(r=>r.data)}
 async function loadPublic(){
- const [cfg,...lists]=await Promise.all([sb.from("site_config").select("id,data"),fetchColl("programs"),fetchColl("services"),fetchColl("offices"),fetchColl("people"),fetchColl("posts"),fetchColl("gallery")]);
- S.data.programs=lists[0];S.data.services=lists[1];S.data.offices=lists[2];S.data.people=lists[3];S.data.posts=lists[4];S.data.gallery=lists[5];
+ const [cfg,...lists]=await Promise.all([sb.from("site_config").select("id,data"),fetchColl("programs"),fetchColl("services"),fetchColl("offices"),fetchColl("people"),fetchColl("posts"),fetchColl("gallery"),fetchColl("trainees"),fetchColl("videos")]);
+ S.data.programs=lists[0];S.data.services=lists[1];S.data.offices=lists[2];S.data.people=lists[3];S.data.posts=lists[4];S.data.gallery=lists[5];S.data.trainees=lists[6];S.data.videos=lists[7];
  (cfg.data||[]).forEach(r=>{if(r.id==="settings")S.data.settings={...structuredClone(SEED.settings),...r.data};if(r.id==="content")S.data.content={en:{},ar:{},...r.data}})}
 async function setSession(session){S.dTab="overview";S.q="";
  const email=(session?.user?.email||"").toLowerCase();
@@ -540,6 +540,7 @@ V.home=()=>{const posts=pubPosts().slice(0,3);return `
 <section class="blk" style="background:var(--surface-2)"><div class="wrap">${systemBlock()}</div></section>
 ${fashionBand()}
 ${leadersBlock()}
+${videosBlock()}
 <section class="blk"${leadersBlock()?' style="background:var(--surface-2)"':""}><div class="wrap">
  <div class="sec-head"><div><div class="eyebrow">${t("path_eyebrow")}</div><h2>${t("path_title")}</h2></div><p class="muted">${t("path_lead")}</p></div>
  ${trackLadder()}
@@ -645,6 +646,134 @@ V.fashion=()=>{const f=S.gf||"all",list=galleryItems().filter(g=>f==="all"||g.ca
 function lightbox(id){const g=(S.data.gallery||[]).find(x=>String(x.id)===String(id));if(!g)return;
  modal(`<figure class="lb"><img src="${esc(g.img)}" alt=""><figcaption><b>${esc(LX(g,"en","ar"))}</b>${LX(g,"ten","tar")?`<span class="muted">${esc(LX(g,"ten","tar"))}</span>`:""}<span class="pill info">${t("gcat_"+g.cat)}</span></figcaption></figure>`)}
 
+/* ---------- members, certificate kinds, trainees, videos (2026-11 update) ---------- */
+Object.assign(I18N.en,{
+ nav_directory:"Members",cta_directory:"Members",dir_title:"Members",dir_lead:"Presidents and former presidents, trainers, consultants, professional diploma and doctorate holders, and all members of the Federation.",
+ nav_news:"News",nav_videos:"Videos",
+ cat_leader:"Presidents",cat_former:"Former presidents",cat_trainer:"Trainers",cat_consultant:"Consultants",cat_graduate:"Diploma & doctorate",cat_member:"Members",
+ rank_former_president:"Former President",
+ student:"Member",a_students:"Members",a_people:"Members",total_students:"Members with portal access",add_student:"Add member",student_portal:"Member portal",
+ students_hint_real:"A member signs in by opening Sign in → Create account with the email saved on their record.",
+ d_certs:"My certificates & accreditations",
+ a_certs:"Certificates & accreditations",issue_cert:"Issue certificate / accreditation",certs_earned:"Certificates",
+ kind:"Type",kind_certificate:"Certificate",kind_accreditation:"Accreditation",kind_membership:"Membership certificate",kind_presidency:"Presidency certificate",
+ cert_title_ar:"Title on the certificate (Arabic)",cert_title_en:"Title on the certificate (English)",cert_title_hint:"For example: President of the Federation in Jordan. Leave empty to use the program name.",
+ member:"Member",account:"Portal account",acc_email:"Login email (optional)",acc_prog:"Current program",acc_status:"Account status",acc_progress:"Progress %",has_account:"Has portal",
+ bio_ar:"Bio (Arabic)",bio_en:"Bio (English)",about_member:"About",view_profile:"View profile",back_members:"Back to members",member_certs:"Certificates & accreditations",no_certs:"No certificates published yet.",
+ a_trainees:"Trainers' students",trainees:"Students",trainees_of:"Students of this trainer",trainer:"Trainer",trainee_name:"Student name",course:"Course / program",n_trainees:"students",all_trainers:"All trainers",no_trainees:"No students recorded yet.",
+ a_videos:"Videos",videos_title:"Videos",videos_lead:"Lectures, workshops and events by the Federation's presidents, trainers and experts, and videos introducing the Federation.",
+ vcat_intro:"About the Federation",vcat_lecture:"Lectures",vcat_workshop:"Workshops",vcat_event:"Events",vcat_interview:"Interviews",
+ presenter:"Presenter",video_link:"Video link (YouTube, Vimeo or .mp4)",videos_empty:"No videos have been published yet.",intro_title:"Get to know the Federation",latest_videos:"Latest videos",all_videos:"All videos",member_videos:"Videos",none:"—",
+ cd_certificate:"Professional Certificate",cd_accreditation:"Certificate of Accreditation",cd_membership:"Certificate of Membership",cd_presidency:"Certificate of Presidency",
+ g_members:"Members & videos",
+});
+Object.assign(I18N.ar,{
+ nav_directory:"الأعضاء",cta_directory:"الأعضاء",dir_title:"الأعضاء",dir_lead:"الرؤساء والرؤساء السابقون، والمدربون والمستشارون، وحملة الدبلوم والدكتوراه المهنية، وجميع أعضاء الاتحاد.",
+ nav_news:"الأخبار",nav_videos:"الفيديوهات",
+ cat_leader:"الرؤساء",cat_former:"الرؤساء السابقون",cat_trainer:"المدربون",cat_consultant:"المستشارون",cat_graduate:"الدبلوم والدكتوراه",cat_member:"الأعضاء",
+ rank_former_president:"رئيس سابق",
+ student:"عضو",a_students:"الأعضاء",a_people:"الأعضاء",total_students:"أعضاء لديهم حساب دخول",add_student:"إضافة عضو",student_portal:"بوابة الأعضاء",
+ students_hint_real:"يدخل العضو عبر تسجيل الدخول ← إنشاء حساب باستخدام البريد المحفوظ في سجله.",
+ d_certs:"شهاداتي واعتماداتي",
+ a_certs:"الشهادات والاعتمادات",issue_cert:"إصدار شهادة / اعتماد",certs_earned:"الشهادات",
+ kind:"النوع",kind_certificate:"شهادة",kind_accreditation:"اعتماد",kind_membership:"شهادة عضوية",kind_presidency:"شهادة رئاسة",
+ cert_title_ar:"المسمّى على الشهادة (عربي)",cert_title_en:"المسمّى على الشهادة (إنجليزي)",cert_title_hint:"مثال: رئيس الاتحاد في الأردن. اتركه فارغاً لاستخدام اسم البرنامج.",
+ member:"العضو",account:"حساب الدخول",acc_email:"بريد الدخول (اختياري)",acc_prog:"البرنامج الحالي",acc_status:"حالة الحساب",acc_progress:"نسبة التقدّم %",has_account:"له حساب",
+ bio_ar:"نبذة (عربي)",bio_en:"نبذة (إنجليزي)",about_member:"نبذة",view_profile:"عرض الملف",back_members:"العودة إلى الأعضاء",member_certs:"الشهادات والاعتمادات",no_certs:"لا توجد شهادات منشورة بعد.",
+ a_trainees:"طلاب المدربين",trainees:"الطلاب",trainees_of:"طلاب المدرب",trainer:"المدرب",trainee_name:"اسم الطالب",course:"الدورة / البرنامج",n_trainees:"طالب",all_trainers:"كل المدربين",no_trainees:"لا يوجد طلاب مسجّلون بعد.",
+ a_videos:"الفيديوهات",videos_title:"الفيديوهات",videos_lead:"محاضرات وورش وفعاليات يقدّمها رؤساء الاتحاد ومدربوه وخبراؤه، وفيديوهات تعريفية بالاتحاد.",
+ vcat_intro:"تعريف بالاتحاد",vcat_lecture:"محاضرات",vcat_workshop:"ورش عمل",vcat_event:"فعاليات",vcat_interview:"لقاءات",
+ presenter:"المحاضر / المقدّم",video_link:"رابط الفيديو (YouTube أو Vimeo أو mp4)",videos_empty:"لم يُنشر أي فيديو بعد.",intro_title:"تعرّف على الاتحاد",latest_videos:"أحدث الفيديوهات",all_videos:"كل الفيديوهات",member_videos:"فيديوهات",none:"—",
+ cd_certificate:"شهادة مهنية",cd_accreditation:"شهادة اعتماد",cd_membership:"شهادة عضوية",cd_presidency:"شهادة رئاسة",
+ g_members:"الأعضاء والفيديوهات",
+});
+PCATS.splice(0,PCATS.length,"leader","former","trainer","consultant","graduate","member");
+RANKS.former=["former_president"];
+RANK_ORDER.splice(0,RANK_ORDER.length,...["leader","former","trainer","consultant","graduate","member"].flatMap(c=>RANKS[c]));
+const CKINDS=["certificate","accreditation","membership","presidency"];
+const VCATS=["intro","lecture","workshop","event","interview"];
+const kindForCat=c=>({leader:"presidency",former:"presidency",member:"membership",trainer:"accreditation",consultant:"accreditation"})[c]||"certificate";
+const person=id=>(S.data.people||[]).find(p=>String(p.id)===String(id));
+const pname=p=>p?LX(p,"en","ar"):"";
+function certLabel(c){if(LX(c,"cten","ctar"))return LX(c,"cten","ctar");if(c.prog){const p=S.data.programs.find(x=>x.id===c.prog);if(p)return L(p)}return t("kind_"+(c.kind||"certificate"))}
+function photoBox(p,cls){const nm=pname(p);return p&&p.photo?`<img class="${cls}" src="${esc(p.photo)}" alt="${esc(nm)}" loading="lazy">`:`<span class="${cls} ph-i"><span>${esc(initials(nm||"?"))}</span></span>`}
+const trainees=()=>S.data.trainees||[];
+const traineesOf=id=>trainees().filter(x=>String(x.trainer)===String(id)).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+const videosAll=()=>(S.data.videos||[]).slice().sort((a,b)=>((+a.order||999)-(+b.order||999))||String(b.date||"").localeCompare(String(a.date||"")));
+function vThumb(v){const y=ytId(v.url);return v.thumb||(y?`https://img.youtube.com/vi/${y}/hqdefault.jpg`:"")}
+
+/* portrait member card (whole card opens the profile) */
+personCard=function(p,big){const tr=p.cat==="trainer"?traineesOf(p.id).length:0;
+ return `<a class="card mcard${big?" big":""}" href="#m-${esc(p.id)}">${photoBox(p,"mphoto")}
+ <span class="mbody"><span class="pill ${p.cat==="leader"?"hq":p.cat==="former"?"warn":"info"}">${t("rank_"+p.rank)}</span>
+ <b class="mname">${esc(pname(p))}</b>
+ ${LX(p,"ten","tar")?`<span class="muted mtitle">${esc(LX(p,"ten","tar"))}</span>`:""}
+ <span class="mmeta">${LX(p,"cen","car")?`<span>${ico("globe",14)} ${esc(LX(p,"cen","car"))}</span>`:""}${tr?`<span>${ico("users",14)} ${tr} ${t("n_trainees")}</span>`:""}</span></span></a>`};
+
+
+function videoCard(v){const th=vThumb(v),pr=person(v.member);
+ return `<button type="button" class="card vcard" data-act="playv" data-id="${esc(v.id)}"><span class="pc-img">${th?`<img src="${esc(th)}" alt="" loading="lazy">`:`<span class="pc-ph">${ico("play",34)}</span>`}<span class="pc-play">${ico("play",22)}</span></span>
+ <span class="pc-body"><span class="pc-meta"><span class="pill info">${t("vcat_"+(v.cat||"lecture"))}</span>${v.date?`<span class="muted">${fmtDate(v.date)}</span>`:""}</span>
+ <b class="vtitle">${esc(LX(v,"en","ar"))}</b>${pr?`<span class="vpres">${photoBox(pr,"vav")}<span>${esc(pname(pr))}</span></span>`:""}</span></button>`}
+function playVideo(id){const v=(S.data.videos||[]).find(x=>String(x.id)===String(id));if(!v)return;const pr=person(v.member);
+ modal(`<div class="vplay">${videoEmbed(v.url)}<div class="pc-meta"><span class="pill info">${t("vcat_"+(v.cat||"lecture"))}</span>${v.date?`<span class="muted">${fmtDate(v.date)}</span>`:""}</div><h2 style="font-size:1.3rem;margin-top:8px">${esc(LX(v,"en","ar"))}</h2>${LX(v,"den","dar")?`<div class="art-body" style="font-size:1rem;margin-top:8px">${bodyHtml(LX(v,"den","dar"))}</div>`:""}${pr?`<a class="vpres" href="#m-${esc(pr.id)}" style="margin-top:14px">${photoBox(pr,"vav")}<span><b>${esc(pname(pr))}</b><small class="muted"> · ${t("rank_"+pr.rank)}</small></span></a>`:""}</div>`)}
+
+V.videos=()=>{const f=S.vf||"all",all=videosAll(),list=all.filter(v=>f==="all"||v.cat===f),cats=VCATS.filter(c=>all.some(v=>v.cat===c)),intro=all.find(v=>v.cat==="intro"&&v.featured!=="no");
+ return `${pageHead("videos_title","videos_lead")}
+<section class="blk"><div class="wrap" style="display:grid;gap:30px">
+ ${intro&&f==="all"?`<div class="vintro"><div>${videoEmbed(intro.url)}</div><div><div class="eyebrow">${t("vcat_intro")}</div><h2 style="margin-top:6px">${esc(LX(intro,"en","ar"))}</h2>${LX(intro,"den","dar")?`<div class="muted" style="margin-top:10px">${bodyHtml(LX(intro,"den","dar"))}</div>`:""}</div></div>`:""}
+ ${cats.length>1?`<div class="tabs" style="margin:0">${["all",...cats].map(k=>`<button type="button" class="${k===f?"on":""}" data-act="vf" data-f="${k}">${k==="all"?t("all"):t("vcat_"+k)}</button>`).join("")}</div>`:""}
+ ${list.length?`<div class="grid g3">${list.filter(v=>!(intro&&f==="all"&&v===intro)).map(videoCard).join("")}</div>`:`<div class="empty">${ico("play",34)}<p>${t("videos_empty")}</p></div>`}
+</div></section>`};
+
+function videosBlock(){const all=videosAll();if(!all.length)return"";const intro=all.find(v=>v.cat==="intro"&&v.featured!=="no"),rest=all.filter(v=>v!==intro&&v.featured!=="no").slice(0,3);
+ return `<section class="blk" style="background:var(--surface-2)"><div class="wrap" style="display:grid;gap:26px">
+ <div class="sec-head" style="margin:0"><div><div class="eyebrow">${t("nav_videos")}</div><h2>${intro?t("intro_title"):t("latest_videos")}</h2></div><a class="btn btn-ghost" href="#videos">${t("all_videos")}</a></div>
+ ${intro?`<div class="vintro"><div>${videoEmbed(intro.url)}</div><div><h3 style="font-size:1.3rem">${esc(LX(intro,"en","ar"))}</h3>${LX(intro,"den","dar")?`<div class="muted" style="margin-top:10px">${bodyHtml(LX(intro,"den","dar"))}</div>`:""}</div></div>`:""}
+ ${rest.length?`<div class="grid g3">${rest.map(videoCard).join("")}</div>`:""}</div></section>`}
+
+/* member profile page */
+V.member=()=>{const id=decodeURIComponent(location.hash.slice(3)),p=person(id);
+ if(!p)return `${pageHead("dir_title")}<section class="blk"><div class="wrap"><div class="empty"><p>${t("not_found")}</p><a class="btn btn-ghost" href="#directory">${t("back_members")}</a></div></div></section>`;
+ const trs=traineesOf(p.id),vids=videosAll().filter(v=>String(v.member)===String(p.id)),bio=LX(p,"bioen","bioar");
+ if(REAL&&S.mcertFor!==p.id){S.mcertFor=p.id;S.mcerts=null;sb.rpc("member_certificates",{p_sid:p.id}).then(({data})=>{if(S.mcertFor===p.id){S.mcerts=data||[];const box=document.getElementById("mcerts");if(box)box.innerHTML=mcertsHtml(S.mcerts)}})}
+ const certs=REAL?S.mcerts:(S.data.certs||[]).filter(c=>c.sid===p.id);
+ return `<div class="page-head"><div class="wrap"><div class="crumbs"><a href="#home">${t("nav_home")}</a> / <a href="#directory" data-act="dircat" data-c="${esc(p.cat)}">${t("nav_directory")}</a> / ${esc(t("cat_"+p.cat))}</div></div></div>
+<section class="blk mprofile"><div class="wrap mp-grid">
+ <div class="mp-photo">${photoBox(p,"mp-img")}</div>
+ <div class="mp-info"><span class="pill ${p.cat==="leader"?"hq":p.cat==="former"?"warn":"info"}">${t("rank_"+p.rank)}</span>
+  <h1>${esc(pname(p))}</h1>
+  ${LX(p,"ten","tar")?`<p class="mp-title">${esc(LX(p,"ten","tar"))}</p>`:""}
+  <div class="mmeta" style="font-size:.95rem">${LX(p,"cen","car")?`<span>${ico("globe",16)} ${esc(LX(p,"cen","car"))}</span>`:""}${trs.length?`<span>${ico("users",16)} ${trs.length} ${t("n_trainees")}</span>`:""}${vids.length?`<span>${ico("play",14)} ${vids.length} ${t("member_videos")}</span>`:""}</div>
+  ${bio?`<div class="mp-bio"><h3>${t("about_member")}</h3>${bodyHtml(bio)}</div>`:""}
+  <div class="mp-sec"><h3>${t("member_certs")}</h3><div id="mcerts">${certs?mcertsHtml(certs):`<p class="muted">${t("loading")}</p>`}</div></div>
+ </div></div></section>
+ ${trs.length?`<section class="blk" style="background:var(--surface-2)"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("trainees")}</div><h2>${t("trainees_of")}: ${esc(pname(p))}</h2></div><span class="pill info num">${trs.length} ${t("n_trainees")}</span></div>
+  <div class="panel"><div class="tbl-wrap"><table><thead><tr><th>#</th><th>${t("trainee_name")}</th><th>${t("course")}</th><th>${t("country")}</th><th>${t("date")}</th><th>${t("cert_no")}</th></tr></thead><tbody>${trs.map((x,i)=>`<tr><td class="num muted">${i+1}</td><td><b>${esc(LX(x,"en","ar"))}</b></td><td>${esc(LX(x,"course_en","course_ar"))}</td><td>${esc(x.country||"—")}</td><td>${x.date?fmtDate(x.date):"—"}</td><td>${x.certno?`<a href="#verify" class="mono" data-act="gover" data-no="${esc(x.certno)}">${esc(x.certno)}</a>`:"—"}</td></tr>`).join("")}</tbody></table></div></div></div></section>`:""}
+ ${vids.length?`<section class="blk"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("nav_videos")}</div><h2>${t("member_videos")}: ${esc(pname(p))}</h2></div></div><div class="grid g3">${vids.map(videoCard).join("")}</div></div></section>`:""}
+ <section class="blk" style="padding-top:0"><div class="wrap"><a class="btn btn-ghost" href="#directory" data-act="dircat" data-c="${esc(p.cat)}">${t("back_members")}</a></div></section>`};
+function mcertsHtml(list){if(!list||!list.length)return `<p class="muted">${t("no_certs")}</p>`;
+ return `<div class="mcerts">${list.map(c=>{const st=certStatus(c);return `<div class="mcert"><span class="ico">${ico(c.kind==="presidency"?"star":c.kind==="membership"?"users":"cert",20)}</span><div><b>${esc(certLabel(c))}</b><div class="muted" style="font-size:.85rem">${t("kind_"+(c.kind||"certificate"))}${c.issued?" · "+fmtDate(c.issued):""}</div></div><span class="pill ${st==="valid"?"ok":st==="revoked"?"bad":"warn"}">${t(st)}</span><a class="btn btn-ghost btn-sm mono" href="#verify" data-act="gover" data-no="${esc(c.no)}">${esc(c.no)}</a></div>`}).join("")}</div>`}
+
+/* members directory page (replaces the earlier one) */
+V.directory=()=>{
+ const c=PCATS.includes(S.dcat)?S.dcat:"leader",rk=S.drank||"all",q=(S.dq||"").toLowerCase();
+ const all=(S.data.people||[]).filter(p=>p.cat===c);
+ const list=sortPeople(all.filter(p=>(rk==="all"||p.rank===rk)&&(!q||[p.en,p.ar,p.cen,p.car,p.ten,p.tar,p.certno].join(" ").toLowerCase().includes(q))));
+ const ranks=RANKS[c]||[];
+ return `${pageHead("dir_title","dir_lead")}
+<section class="blk"><div class="wrap">
+ <div class="tabs">${PCATS.map(k=>`<button type="button" class="${k===c?"on":""}" data-act="dircat" data-c="${k}">${t("cat_"+k)} <span class="num" style="opacity:.7">${(S.data.people||[]).filter(p=>p.cat===k).length}</span></button>`).join("")}</div>
+ ${c==="leader"?`<p class="muted" style="max-width:70ch;margin-bottom:20px">${t("leaders_lead")}</p>`:""}
+ <div class="dir-tools"><input class="search" id="dq" placeholder="${t("dir_search")}" value="${esc(S.dq||"")}">
+  ${ranks.length>1?`<div class="chips">${["all",...ranks].map(r=>`<button type="button" class="${r===rk?"on":""}" data-act="drank" data-r="${r}">${r==="all"?t("all_ranks"):t("rank_"+r)}</button>`).join("")}</div>`:""}</div>
+ ${list.length?`<div class="mgrid">${list.map(p=>personCard(p,c==="leader"&&(p.rank==="global_president"||p.rank==="global_vp"))).join("")}</div>`:`<div class="empty">${ico("users",34)}<p>${t("dir_empty")}</p></div>`}
+</div></section>`};
+leadersBlock=function(){const top=sortPeople((S.data.people||[]).filter(p=>p.cat==="leader")).slice(0,4);if(!top.length)return"";
+ return `<section class="blk"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("leaders_eyebrow")}</div><h2>${t("leaders_title")}</h2></div><p class="muted">${t("leaders_lead")}</p></div>
+ <div class="mgrid lead">${top.map(p=>personCard(p,true)).join("")}</div>
+ <div style="margin-top:22px"><a class="btn btn-ghost" href="#directory" data-act="dircat" data-c="leader">${t("cat_leader")}</a></div></div></section>`};
+
 function certResult(no,found){
  if(!no)return"";
  const c=found!==undefined?found:S.data.certs.find(x=>x.no.toUpperCase()===no.trim().toUpperCase());
@@ -652,7 +781,7 @@ function certResult(no,found){
  const st=certStatus(c),cls={valid:"ok",revoked:"bad",expired:"warn"}[st],msg={valid:"v_valid",revoked:"v_revoked",expired:"v_expired"}[st];
  const p=prog(c.prog),o=office(c.office);
  return `<div class="cert-result"><div class="bar ${cls}">${st==="valid"?"✓":"!"} ${t(msg)}</div>
- <dl><dt>${t("cert_no")}</dt><dd class="mono">${esc(c.no)}</dd><dt>${t("holder")}</dt><dd>${esc(c.name)}</dd><dt>${t("program")}</dt><dd>${p?L(p):esc(c.prog)}</dd><dt>${t("issued")}</dt><dd>${fmtDate(c.issued)}</dd><dt>${t("expires")}</dt><dd>${c.expires?fmtDate(c.expires):"—"}</dd><dt>${t("office")}</dt><dd>${o?esc(L(o))+", "+esc(S.lang==="ar"?o.car:o.cen):"—"}</dd><dt>${t("accreditation")}</dt><dd><div class="accr-row">${accrLogos()}</div></dd></dl>
+ <dl><dt>${t("cert_no")}</dt><dd class="mono">${esc(c.no)}</dd><dt>${t("holder")}</dt><dd>${esc(c.name)}</dd><dt>${t("kind")}</dt><dd>${t("kind_"+(c.kind||"certificate"))}</dd><dt>${c.prog&&!c.ctar?t("program"):t("specialty_t")}</dt><dd>${esc(certLabel(c))}</dd><dt>${t("issued")}</dt><dd>${fmtDate(c.issued)}</dd><dt>${t("expires")}</dt><dd>${c.expires?fmtDate(c.expires):"—"}</dd><dt>${t("office")}</dt><dd>${o?esc(L(o))+", "+esc(S.lang==="ar"?o.car:o.cen):"—"}</dd><dt>${t("accreditation")}</dt><dd><div class="accr-row">${accrLogos()}</div></dd></dl>
  ${st==="valid"?`<div style="padding:0 20px 20px"><button class="btn btn-ghost btn-sm" data-act="showcert" data-no="${esc(c.no)}">${t("view_cert")}</button></div>`:""}</div>`}
 V.verify=()=>`${pageHead("verify_title","verify_lead")}
 <section class="blk"><div class="wrap"><div class="verify-box">
@@ -738,7 +867,7 @@ V.student=()=>{
  const course=`<div class="panel"><header><h3>${esc(L(p))}</h3>${stPillS(me.status)}</header><div class="body course">
   <div class="top-row"><span class="muted">${t("progress")}</span><b class="num">${pr}%</b></div><div class="prog"><i style="width:${pr}%"></i></div>
   <p class="muted" style="margin-top:8px;font-size:.92rem">${esc(S.lang==="ar"?p.dar:p.den)}</p></div></div>`;
- const certList=myCerts.length?`<div class="grid g2">${myCerts.map(c=>{const st=certStatus(c);return `<div class="card" style="display:grid;gap:10px"><div style="display:flex;justify-content:space-between;gap:10px"><b>${L(prog(c.prog))}</b><span class="pill ${st==="valid"?"ok":st==="revoked"?"bad":"warn"}">${t(st)}</span></div><span class="mono muted">${c.no}</span><span class="muted" style="font-size:.88rem">${t("issued")}: ${fmtDate(c.issued)}</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-gold btn-sm" data-act="showcert" data-no="${c.no}">${t("view_cert")}</button><a class="btn btn-ghost btn-sm" href="#verify" data-act="gover" data-no="${c.no}">${t("verify_btn")}</a></div></div>`}).join("")}</div><p class="muted" style="font-size:.85rem">${t("download_note")}</p>`:`<p class="muted">—</p>`;
+ const certList=myCerts.length?`<div class="grid g2">${myCerts.map(c=>{const st=certStatus(c);return `<div class="card" style="display:grid;gap:10px"><div style="display:flex;justify-content:space-between;gap:10px"><b>${esc(certLabel(c))}</b><span class="pill ${st==="valid"?"ok":st==="revoked"?"bad":"warn"}">${t(st)}</span></div><span class="mono muted">${c.no}</span><span class="muted" style="font-size:.88rem">${t("issued")}: ${fmtDate(c.issued)}</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-gold btn-sm" data-act="showcert" data-no="${c.no}">${t("view_cert")}</button><a class="btn btn-ghost btn-sm" href="#verify" data-act="gover" data-no="${c.no}">${t("verify_btn")}</a></div></div>`}).join("")}</div><p class="muted" style="font-size:.85rem">${t("download_note")}</p>`:`<p class="muted">—</p>`;
  const payTbl=`<div class="panel"><div class="tbl-wrap"><table><thead><tr><th>${t("invoice")}</th><th>${t("details")}</th><th>${t("date")}</th><th>${t("amount")}</th><th>${t("status")}</th></tr></thead><tbody>${myPay.map(x=>`<tr><td class="mono">${esc(x.inv)}</td><td>${L(x)}</td><td>${fmtDate(x.date)}</td><td class="num">${money(+x.amt||0)}</td><td><span class="pill ${x.st==="paid"?"ok":"warn"}">${t(x.st)}</span></td></tr>`).join("")}</tbody></table></div></div>`;
  let body="";
  if(S.dTab==="overview")body=`<h2>${t("welcome")}, ${esc(me.name.split(" ")[0])}</h2>
@@ -755,17 +884,22 @@ const F=(k,l,ty="text",o,ol,extra={})=>({k,l,ty,o,ol,...extra});
 const SCHEMA={
  students:{title:"a_students",f:[F("id","ID"),F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1}),F("country","country"),F("prog","program","prog"),F("status","status","select",["active","graduated","suspended"]),F("progress","progress","number"),F("joined","date","date")],
   auto:it=>{if(!it.id)it.id=uid("S-");if(!it.joined)it.joined=TODAY}},
- certs:{title:"a_certs",f:[F("no","cert_no"),F("sid","student","student"),F("name","holder","text",0,0,{req:1}),F("prog","program","prog"),F("office","office","office"),F("issued","issued","date"),F("expires","expires","date"),F("status","status","select",["valid","revoked"])],
-  auto:it=>{if(!it.no)it.no=nextCertNo(it.prog,it.issued);if(!it.issued)it.issued=TODAY;if(it.sid&&!it.name){const st=S.data.students.find(x=>x.id===it.sid);if(st)it.name=st.name}}},
+ certs:{title:"a_certs",f:[F("kind","kind","select",CKINDS,"ckind"),F("no","cert_no","text",0,0,{dir:"ltr"}),F("sid","member","member"),F("name","holder","text",0,0,{req:1}),F("prog","program","prog",0,0,{opt0:1}),F("ctar","cert_title_ar","text",0,0,{dir:"rtl"}),F("cten","cert_title_en","text",0,0,{dir:"ltr"}),F("office","office","office"),F("issued","issued","date"),F("expires","expires","date"),F("status","status","select",["valid","revoked"])],
+  auto:it=>{if(!it.no)it.no=nextCertNo(it.prog||({accreditation:"ACC",membership:"MEM",presidency:"PRS"})[it.kind],it.issued);if(!it.issued)it.issued=TODAY;if(it.sid&&!it.name){const st=person(it.sid);if(st)it.name=pname(st)}}},
  programs:{title:"a_programs",f:[F("id","code","text",0,0,{req:1}),F("track","track","select",[1,2,3],"track"),F("lvl","lvl","number"),F("price","price","number"),F("en","name_en","text",0,0,{req:1,dir:"ltr"}),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("den","desc_en","textarea",0,0,{dir:"ltr"}),F("dar","desc_ar","textarea",0,0,{dir:"rtl"}),F("wen","who_en","text",0,0,{dir:"ltr"}),F("war","who_ar","text",0,0,{dir:"rtl"}),F("oen","out_en","text",0,0,{dir:"ltr"}),F("oar","out_ar","text",0,0,{dir:"rtl"})]},
  services:{title:"a_services",auto:it=>{it.id=uid("SV-")},f:[F("ic","icon","select",["train","cert","strat","salon","lead","cpd","verify","book","users","cal","globe","star","sparkle","hanger","brush","scissors","drop","news"],"raw"),F("en","name_en","text",0,0,{req:1,dir:"ltr"}),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("den","desc_en","textarea",0,0,{dir:"ltr"}),F("dar","desc_ar","textarea",0,0,{dir:"rtl"}),F("len","list_en","lines",0,0,{dir:"ltr"}),F("lar","list_ar","lines",0,0,{dir:"rtl"})]},
  offices:{title:"a_offices",f:[F("en","city_en","text",0,0,{req:1,dir:"ltr"}),F("ar","city_ar","text",0,0,{req:1,dir:"rtl"}),F("cen","country_en","text",0,0,{dir:"ltr"}),F("car","country_ar","text",0,0,{dir:"rtl"}),F("region","region","select",["americas","mena","europe","asia"]),F("type","type","select",["hq","reg","rep"],"otype"),F("phone","phone","text",0,0,{dir:"ltr"}),F("email","email","text",0,0,{dir:"ltr"}),F("coven","covers_en","text",0,0,{dir:"ltr"}),F("covar","covers_ar","text",0,0,{dir:"rtl"}),F("sen","services_en","text",0,0,{dir:"ltr"}),F("sar","services_ar","text",0,0,{dir:"rtl"}),F("x","map_x","number"),F("y","map_y","number")],
   auto:it=>{it.id=Date.now();if(!it.x||!it.y){const [x,y]=REGXY[it.region]||[400,160];it.x=Math.round(x+Math.random()*30-15);it.y=Math.round(y+Math.random()*30-15)}}},
- payments:{title:"a_payments",f:[F("inv","invoice"),F("sid","student","student"),F("en","desc_en","text",0,0,{dir:"ltr"}),F("ar","desc_ar","text",0,0,{dir:"rtl"}),F("amt","amount","number"),F("date","date","date"),F("st","status","select",["paid","due","pending"])],
+ payments:{title:"a_payments",f:[F("inv","invoice"),F("sid","member","member"),F("en","desc_en","text",0,0,{dir:"ltr"}),F("ar","desc_ar","text",0,0,{dir:"rtl"}),F("amt","amount","number"),F("date","date","date"),F("st","status","select",["paid","due","pending"])],
   auto:it=>{if(!it.inv)it.inv="INV-"+TODAY.slice(0,4)+"-"+String(1000+Math.floor(Math.random()*9000))}},
  admins:{title:"a_admins",f:[F("name","name","text",0,0,{req:1}),F("email","email","text",0,0,{req:1,dir:"ltr"})]},
- people:{title:"a_people",f:[F("cat","category","select",PCATS,"pcat"),F("rank","rank","select",RANK_ORDER,"rank"),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("en","name_en","text",0,0,{dir:"ltr"}),F("tar","specialty_t","text",0,0,{dir:"rtl"}),F("ten","specialty_t","text",0,0,{dir:"ltr",suffix:" (EN)"}),F("car","country_ar","text",0,0,{dir:"rtl"}),F("cen","country_en","text",0,0,{dir:"ltr"}),F("certno","cert_short","text",0,0,{dir:"ltr"}),F("order","order","number"),F("photo","photo","image",0,0,{max:360})],
+ people:{title:"a_people",f:[F("cat","category","select",PCATS,"pcat"),F("rank","rank","select",RANK_ORDER,"rank"),F("ar","name_ar","text",0,0,{req:1,dir:"rtl"}),F("en","name_en","text",0,0,{dir:"ltr"}),F("tar","specialty_t","text",0,0,{dir:"rtl"}),F("ten","specialty_t","text",0,0,{dir:"ltr",suffix:" (EN)"}),F("car","country_ar","text",0,0,{dir:"rtl"}),F("cen","country_en","text",0,0,{dir:"ltr"}),F("certno","cert_short","text",0,0,{dir:"ltr"}),F("order","order","number"),F("bioar","bio_ar","textarea",0,0,{dir:"rtl",rows:4}),F("bioen","bio_en","textarea",0,0,{dir:"ltr",rows:4}),F("photo","photo","image",0,0,{max:720}),
+  F("acc_email","acc_email","text",0,0,{dir:"ltr",sec:"account"}),F("acc_prog","acc_prog","prog",0,0,{opt0:1}),F("acc_status","acc_status","select",["active","graduated","suspended"]),F("acc_progress","acc_progress","number")],
   auto:it=>{it.id=uid("P-")}},
+ trainees:{title:"a_trainees",f:[F("trainer","trainer","trainer"),F("ar","trainee_name","text",0,0,{req:1,dir:"rtl"}),F("en","name_en","text",0,0,{dir:"ltr"}),F("course_ar","course","text",0,0,{dir:"rtl"}),F("course_en","course","text",0,0,{dir:"ltr",suffix:" (EN)"}),F("country","country"),F("date","date","date"),F("certno","cert_no","text",0,0,{dir:"ltr"})],
+  auto:it=>{it.id=uid("TR-")}},
+ videos:{title:"a_videos",f:[F("cat","category","select",VCATS,"vcat"),F("featured","featured","select",["yes","no"],"yn"),F("url","video_link","text",0,0,{req:1,dir:"ltr",full:1}),F("ar","title_ar","text",0,0,{req:1,dir:"rtl"}),F("en","title_en","text",0,0,{dir:"ltr"}),F("member","presenter","member"),F("date","date","date"),F("order","order","number"),F("dar","desc_ar","textarea",0,0,{dir:"rtl"}),F("den","desc_en","textarea",0,0,{dir:"ltr"}),F("thumb","cover","image",0,0,{max:960})],
+  auto:it=>{it.id=uid("V-");if(!it.date)it.date=TODAY}},
  posts:{title:"a_posts",f:[F("type","type","select",["news","article","video"],"ptype"),F("published","published","select",["yes","no"],"pub"),F("date","date","date"),F("video","video_url","text",0,0,{dir:"ltr",full:1}),F("ar","title_ar","text",0,0,{req:1,dir:"rtl"}),F("en","title_en","text",0,0,{dir:"ltr"}),F("sar","summary_ar","textarea",0,0,{dir:"rtl"}),F("sen","summary_en","textarea",0,0,{dir:"ltr"}),F("bar","body_ar","textarea",0,0,{dir:"rtl",rows:10}),F("ben","body_en","textarea",0,0,{dir:"ltr",rows:10}),F("cover","cover","image",0,0,{max:1280})],
   auto:it=>{it.id=uid("N-");if(!it.date)it.date=TODAY}},
  gallery:{title:"a_gallery",f:[F("cat","category","select",GCATS,"gcat"),F("featured","featured","select",["yes","no"],"yn"),F("ar","title_ar","text",0,0,{dir:"rtl"}),F("en","title_en","text",0,0,{dir:"ltr"}),F("tar","caption_ar","text",0,0,{dir:"rtl"}),F("ten","caption_en","text",0,0,{dir:"ltr"}),F("order","order","number"),F("img","image","image",0,0,{max:1400,req:1})],
@@ -774,21 +908,23 @@ const SCHEMA={
   auto:it=>{it.id=uid("A-")}},
 };
 
-const NUMF=new Set(["progress","lvl","price","amt","exp","x","y","track","office","order"]);
-function optLabel(ol,v){if(ol==="pcat")return t("cat_"+v);if(ol==="rank")return t("rank_"+v);if(ol==="ptype")return t("type_"+v);if(ol==="pub")return t(v==="no"?"pub_no":"pub_yes");if(ol==="gcat")return t("gcat_"+v);if(ol==="yn")return t(v);if(ol==="track")return t(["","track_trainer","track_consult","track_acad"][v]);if(ol==="otype")return t({hq:"hq",reg:"regional",rep:"rep"}[v]);if(ol==="raw")return v;return t(v)}
+const NUMF=new Set(["progress","lvl","price","amt","exp","x","y","track","office","order","acc_progress"]);
+function optLabel(ol,v){if(ol==="ckind")return t("kind_"+v);if(ol==="vcat")return t("vcat_"+v);if(ol==="pcat")return t("cat_"+v);if(ol==="rank")return t("rank_"+v);if(ol==="ptype")return t("type_"+v);if(ol==="pub")return t(v==="no"?"pub_no":"pub_yes");if(ol==="gcat")return t("gcat_"+v);if(ol==="yn")return t(v);if(ol==="track")return t(["","track_trainer","track_consult","track_acad"][v]);if(ol==="otype")return t({hq:"hq",reg:"regional",rep:"rep"}[v]);if(ol==="raw")return v;return t(v)}
 function editModal(coll,idx){
- const sc=SCHEMA[coll],it=idx>=0?S.data[coll][idx]:(coll==="people"&&S.preset?{...S.preset}:coll==="posts"?{date:TODAY,type:"news",published:"yes"}:{});
+ const sc=SCHEMA[coll];let it=idx>=0?S.data[coll][idx]:(S.preset&&S.preset._coll===coll?{...S.preset}:coll==="posts"?{date:TODAY,type:"news",published:"yes"}:{});
+ if(coll==="people"){const st=(S.data.students||[]).find(x=>x.id===it.id);it={...it,acc_email:st?.email||"",acc_prog:st?.prog||"",acc_status:st?.status||"active",acc_progress:st?.progress||0}}
  const fld=f=>{const v=it[f.k]??"",id="e_"+f.k,dir=f.dir?` dir="${f.dir}"`:"";let inp,full=false;
   if(f.ty==="hidden")return "";
   if(f.ty==="image"){full=true;inp=`<div class="img-up"><img id="${id}_pv" src="${esc(v)}" alt=""${v?"":" hidden"}><input type="hidden" id="${id}" value="${esc(v)}"><label class="btn btn-ghost btn-sm" style="cursor:pointer">${t("upload_img")}<input class="imgUp" data-target="${id}" data-max="${f.max||800}" type="file" accept="image/*" hidden></label><button type="button" class="btn btn-danger btn-sm" data-act="imgclear" data-target="${id}">${t("remove_img")}</button></div>`}
   else if(f.ty==="textarea"||f.ty==="lines"){full=true;inp=`<textarea id="${id}" rows="${f.rows||(f.ty==="lines"?4:3)}"${dir}>${esc(f.ty==="lines"?(v||[]).join("\n"):v)}</textarea>`}
-  else if(["select","prog","office","student"].includes(f.ty)){
-   const opts=f.ty==="prog"?S.data.programs.map(p=>[p.id,L(p)]):f.ty==="office"?S.data.offices.map(o=>[o.id,L(o)]):f.ty==="student"?S.data.students.map(s=>[s.id,s.id+" — "+s.name]):f.o.map(x=>[x,optLabel(f.ol,x)]);
+  else if(["select","prog","office","student","member","trainer"].includes(f.ty)){
+   let opts=f.ty==="prog"?S.data.programs.map(p=>[p.id,L(p)]):f.ty==="office"?S.data.offices.map(o=>[o.id,L(o)]):f.ty==="member"?sortPeople(S.data.people||[]).map(p=>[p.id,pname(p)+" — "+t("rank_"+p.rank)]):f.ty==="trainer"?sortPeople((S.data.people||[]).filter(p=>p.cat==="trainer"||p.cat==="consultant"||p.cat==="leader")).map(p=>[p.id,pname(p)+" — "+t("rank_"+p.rank)]):f.ty==="student"?S.data.students.map(s=>[s.id,s.id+" — "+s.name]):(f.k==="rank"&&it.cat&&RANKS[it.cat]?RANKS[it.cat]:f.o).map(x=>[x,optLabel(f.ol,x)]);
+   if(f.opt0||f.ty==="member")opts=[["",t("none")],...opts];
    inp=`<select id="${id}">${opts.map(([a,b])=>`<option value="${esc(a)}" ${String(a)===String(v)?"selected":""}>${esc(b)}</option>`).join("")}</select>`}
   else inp=`<input id="${id}" type="${f.ty==="number"?"number":f.ty==="date"?"date":"text"}"${f.ty==="number"?' step="any"':""} value="${esc(v)}"${f.req?" required":""}${dir}>`;
   if(f.full)full=true;
-  return `<label class="f${full?" full":""}">${t(f.l)}${f.suffix||""}${f.ty==="lines"?` <small class="muted">(${t("one_per_line")})</small>`:""}${inp}</label>`};
- modal(`<h2 style="font-size:1.3rem;margin-bottom:16px">${idx>=0?t("edit"):t("add_new")} · ${t(sc.title)}</h2><form class="form" id="eform" data-coll="${coll}" data-idx="${idx}"><div class="fgrid">${sc.f.map(fld).join("")}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-gold" type="submit">${t("save")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
+  return `${f.sec?`<div class="fsec full"><b>${t(f.sec)}</b><small class="muted">${t(REAL?"students_hint_real":"acc_email")}</small></div>`:""}<label class="f${full?" full":""}">${t(f.l)}${f.suffix||""}${f.ty==="lines"?` <small class="muted">(${t("one_per_line")})</small>`:""}${inp}</label>`};
+ modal(`<h2 style="font-size:1.3rem;margin-bottom:16px">${idx>=0?t("edit"):t("add_new")} · ${t(sc.title)}</h2>${coll==="certs"?`<p class="note" style="margin-bottom:14px">${t("cert_title_hint")}</p>`:""}<form class="form" id="eform" data-coll="${coll}" data-idx="${idx}"><div class="fgrid">${sc.f.map(fld).join("")}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-gold" type="submit">${t("save")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
 function saveEdit(f){
  const coll=f.dataset.coll,idx=+f.dataset.idx,sc=SCHEMA[coll],arr=S.data[coll],it=idx>=0?arr[idx]:{};
  sc.f.forEach(fd=>{if(fd.ty==="hidden")return;const el=document.getElementById("e_"+fd.k);if(!el)return;let val=el.value;
@@ -796,11 +932,16 @@ function saveEdit(f){
   else if(fd.ty==="number"||NUMF.has(fd.k))val=val===""?0:+val;
   else val=val.trim();
   it[fd.k]=val});
+ let acc=null;if(coll==="people"){acc={};["acc_email","acc_prog","acc_status","acc_progress"].forEach(k=>{acc[k]=it[k];delete it[k]})}
  if(idx<0){sc.auto&&sc.auto(it);arr.push(it)}
+ if(acc)syncAccount(it,acc);
  if(coll==="students"&&S.user?.role==="student"&&S.user.id===it.id)S.user.name=it.name;
  save();closeModal();render();toast(t(idx<0?"added":"updated"))}
+function syncAccount(p,acc){const L2=S.data.students,i=L2.findIndex(x=>x.id===p.id);
+ if(acc.acc_email||acc.acc_prog){const rec={...(i>=0?L2[i]:{joined:TODAY}),id:p.id,name:p.ar||p.en,email:acc.acc_email||"",prog:acc.acc_prog||"",status:acc.acc_status||"active",progress:+acc.acc_progress||0,country:p.car||p.cen||""};if(i>=0)L2[i]=rec;else L2.push(rec)}
+ else if(i>=0)L2.splice(i,1)}
 function crud(coll,cols,{extra,noAdd,filter,preset}={}){
- const q=(S.q||"").toLowerCase();S.preset=preset||null;
+ const q=(S.q||"").toLowerCase();S.preset=preset?{...preset,_coll:coll}:null;
  const rows=S.data[coll].map((it,i)=>[it,i]).filter(([it])=>(!filter||filter(it))&&(!q||JSON.stringify(it).toLowerCase().includes(q))).reverse();
  return `<div class="panel"><header><input class="search" id="q" placeholder="${t("search")}" value="${esc(S.q||"")}"><span class="muted num" style="font-size:.85rem">${rows.length} / ${S.data[coll].length}</span>${noAdd?"":`<button class="btn btn-gold btn-sm" data-act="edit" data-coll="${coll}" data-idx="-1">+ ${t("add_new")}</button>`}</header>
  <div class="tbl-wrap"><table><thead><tr>${cols.map(c=>`<th>${t(c[0])}</th>`).join("")}<th></th></tr></thead><tbody>${rows.length?rows.map(([it,i])=>`<tr>${cols.map(c=>`<td>${c[1](it)}</td>`).join("")}<td><div class="act">${extra?extra(it,i):""}<button class="btn btn-ghost btn-sm" data-act="edit" data-coll="${coll}" data-idx="${i}">${t("edit")}</button><button class="btn btn-danger btn-sm" data-act="del" data-coll="${coll}" data-idx="${i}">${t("del")}</button></div></td></tr>`).join(""):`<tr><td colspan="${cols.length+1}" class="muted">${t("no_results")}</td></tr>`}</tbody></table></div></div>`}
@@ -815,6 +956,7 @@ const CGROUPS=[
  ["g_quals",["quals_eyebrow","quals_title","quals_lead","q1","q2","q3","q4","q5","quals_note"]],
  ["g_fashion",["nav_fashion","fash_eyebrow","fash_title","fash_lead","fash_p1","fash_p1d","fash_p2","fash_p2d","fash_p3","fash_p3d","fash_cta","fash_cta2","fash_cta2d","gallery_eyebrow","gallery_title"]],
  ["g_dir",["leaders_eyebrow","leaders_title","leaders_lead","dir_title","dir_lead","cat_leader","cat_trainer","cat_consultant","cat_graduate","cat_member","news_title","news_lead"]],
+ ["g_members",["nav_directory","dir_title","dir_lead","cat_leader","cat_former","cat_trainer","cat_consultant","cat_graduate","cat_member","nav_videos","videos_title","videos_lead","intro_title"]],
  ["g_accr",["ieqm_t","ieqm_d","cpd_t","cpd_d","iso_t","iso_d"]],
  ["g_pages",["prog_title","prog_lead","svc_page_lead","verify_title","verify_lead","offices_title","offices_lead","contact_title","contact_lead"]],
  ["g_general",["fullName","footer_about","track_trainer","track_consult","track_acad","nav_home","nav_about","nav_programs","nav_services","nav_verify","nav_offices","nav_contact","nav_directory","nav_news","cta_directory"]],
@@ -863,7 +1005,7 @@ function settingsView(){
 V.admin=()=>{
  if(!S.user||S.user.role!=="admin"){location.hash="login";return""}
  const D=S.data,newApps=D.apps.filter(a=>a.status==="new").length,newInq=D.inq.filter(i=>!i.read).length;
- const items=[["overview","grid","d_overview"],["content","pen","a_content"],["people","users","a_people"],["posts","news","a_posts"],["gallery","hanger","a_gallery"],["programs","book","a_programs"],["services","layers","a_services"],["offices","pin","a_offices"],["students","users","a_students"],["certs","cert","a_certs"],["apps","file","a_apps",newApps],["inq","inbox","a_inq",newInq],["payments","card","a_payments"],["admins","shield","a_admins"],["settings","gear","a_settings"]];
+ const items=[["overview","grid","d_overview"],["content","pen","a_content"],["people","users","a_people"],["certs","cert","a_certs"],["trainees","book","a_trainees"],["videos","play","a_videos"],["posts","news","a_posts"],["gallery","hanger","a_gallery"],["programs","book","a_programs"],["services","layers","a_services"],["offices","pin","a_offices"],["apps","file","a_apps",newApps],["inq","inbox","a_inq",newInq],["payments","card","a_payments"],["admins","shield","a_admins"],["settings","gear","a_settings"]];
  const stPill=s=>`<span class="pill ${({valid:"ok",graduated:"ok",approved:"ok",paid:"ok",revoked:"bad",rejected:"bad",suspended:"bad",expired:"warn",due:"warn",new:"warn",pending:"warn"})[s]||"info"}">${t(s)}</span>`;
  let body="";
  if(S.dTab==="overview"){
@@ -871,11 +1013,11 @@ V.admin=()=>{
   const vals=ms.map(([ym])=>D.students.filter(s=>(s.joined||"").startsWith(ym)).length+D.apps.filter(a=>(a.date||"").startsWith(ym)).length),mx=Math.max(1,...vals);
   const rev=D.payments.filter(p=>p.st==="paid").reduce((a,b)=>a+(+b.amt||0),0);
   body=`<h2>${t("d_overview")}</h2>
-  <div class="kpis"><div class="kpi"><span>${t("total_students")}</span><b>${D.students.length}</b></div><div class="kpi"><span>${t("issued_certs")}</span><b>${D.certs.length}</b></div><div class="kpi"><span>${t("pending_apps")}</span><b style="color:${newApps?"var(--crimson)":"inherit"}">${newApps}</b></div><div class="kpi"><span>${t("revenue")}</span><b>${money(rev)}</b></div></div>
+  <div class="kpis"><div class="kpi"><span>${t("a_people")}</span><b>${D.people.length}</b></div><div class="kpi"><span>${t("issued_certs")}</span><b>${D.certs.length}</b></div><div class="kpi"><span>${t("pending_apps")}</span><b style="color:${newApps?"var(--crimson)":"inherit"}">${newApps}</b></div><div class="kpi"><span>${t("revenue")}</span><b>${money(rev)}</b></div></div>
   <div class="grid g2" style="align-items:start"><div class="panel"><header><h3>${t("enroll_trend")}</h3></header><div class="body"><div class="bars">${vals.map((v,i)=>`<div><em>${v}</em><i style="height:${Math.max(2,v/mx*100)}%"></i><span>${ms[i][1]}</span></div>`).join("")}</div></div></div>
   <div class="panel"><header><h3>${t("quick_actions")}</h3></header><div class="body" style="display:flex;flex-wrap:wrap;gap:10px">
    <button class="btn btn-gold btn-sm" data-act="edit" data-coll="certs" data-idx="-1">+ ${t("issue_cert")}</button>
-   <button class="btn btn-ghost btn-sm" data-act="edit" data-coll="students" data-idx="-1">+ ${t("add_student")}</button>
+   <button class="btn btn-ghost btn-sm" data-act="edit" data-coll="people" data-idx="-1">+ ${t("add_student")}</button><button class="btn btn-ghost btn-sm" data-act="edit" data-coll="videos" data-idx="-1">+ ${t("a_videos")}</button>
    <button class="btn btn-ghost btn-sm" data-act="edit" data-coll="programs" data-idx="-1">+ ${t("program")}</button>
    <button class="btn btn-ghost btn-sm" data-act="edit" data-coll="offices" data-idx="-1">+ ${t("add_office")}</button>
    <button class="btn btn-ghost btn-sm" data-act="edit" data-coll="payments" data-idx="-1">+ ${t("invoice")}</button>
@@ -883,7 +1025,9 @@ V.admin=()=>{
   </div></div></div>
   <div class="panel"><header><h3>${t("a_programs")}</h3></header><div class="tbl-wrap"><table><thead><tr><th>${t("program")}</th><th>${t("track")}</th><th>${t("a_students")}</th><th>${t("a_certs")}</th></tr></thead><tbody>${D.programs.map(p=>`<tr><td><b>${esc(L(p))}</b></td><td>${optLabel("track",p.track)}</td><td class="num">${D.students.filter(s=>s.prog===p.id).length}</td><td class="num">${D.certs.filter(c=>c.prog===p.id).length}</td></tr>`).join("")}</tbody></table></div></div>`}
  else if(S.dTab==="content")body=contentEditor();
- else if(S.dTab==="people"){const pc=S.apc||"all";body=`<h2>${t("a_people")}</h2><div class="tabs" style="margin:0">${["all",...PCATS].map(k=>`<button type="button" class="${k===pc?"on":""}" data-act="apc" data-c="${k}">${k==="all"?t("all"):t("cat_"+k)} <span class="num" style="opacity:.7">${k==="all"?D.people.length:D.people.filter(p=>p.cat===k).length}</span></button>`).join("")}</div>`+crud("people",[["photo",p=>avatar(p,40)],["name",p=>`<b>${esc(p.ar||p.en)}</b>${p.en&&p.ar?`<div class="muted" style="font-size:.8rem">${esc(p.en)}</div>`:""}`],["category",p=>t("cat_"+p.cat)],["rank",p=>`<span class="pill info">${t("rank_"+p.rank)}</span>`],["country",p=>esc(p.car||p.cen||"—")]],{filter:p=>pc==="all"||p.cat===pc,preset:pc!=="all"?{cat:pc,rank:RANKS[pc][0]}:null})}
+ else if(S.dTab==="people"){const pc=S.apc||"all";body=`<h2>${t("a_people")}</h2><div class="tabs" style="margin:0">${["all",...PCATS].map(k=>`<button type="button" class="${k===pc?"on":""}" data-act="apc" data-c="${k}">${k==="all"?t("all"):t("cat_"+k)} <span class="num" style="opacity:.7">${k==="all"?D.people.length:D.people.filter(p=>p.cat===k).length}</span></button>`).join("")}</div>`+crud("people",[["photo",p=>photoBox(p,"tav")],["name",p=>`<b>${esc(p.ar||p.en)}</b>${p.en&&p.ar?`<div class="muted" style="font-size:.8rem">${esc(p.en)}</div>`:""}`],["category",p=>t("cat_"+p.cat)],["rank",p=>`<span class="pill info">${t("rank_"+p.rank)}</span>`],["country",p=>esc(p.car||p.cen||"—")],["account",p=>D.students.some(x=>x.id===p.id)?`<span class="pill ok">${t("has_account")}</span>`:"—"]],{filter:p=>pc==="all"||p.cat===pc,preset:pc!=="all"?{cat:pc,rank:RANKS[pc][0]}:null,extra:p=>`<a class="btn btn-ghost btn-sm" href="#m-${esc(p.id)}">${t("view")}</a><button class="btn btn-ghost btn-sm" data-act="issuefor" data-id="${esc(p.id)}">${t("issue_cert")}</button>${p.cat==="trainer"||traineesOf(p.id).length?`<button class="btn btn-ghost btn-sm" data-act="trof" data-id="${esc(p.id)}">${t("trainees")} (${traineesOf(p.id).length})</button>`:""}`})}
+ else if(S.dTab==="trainees"){const tr=S.atr||"all",trs=sortPeople(D.people.filter(p=>p.cat==="trainer"||D.trainees.some(x=>x.trainer===p.id)));body=`<h2>${t("a_trainees")}</h2><div class="chips">${[["all",t("all_trainers")],...trs.map(p=>[p.id,pname(p)])].map(([k,l])=>`<button type="button" class="${k===tr?"on":""}" data-act="atr" data-id="${esc(k)}">${esc(l)} <span class="num" style="opacity:.7">${k==="all"?D.trainees.length:traineesOf(k).length}</span></button>`).join("")}</div>`+crud("trainees",[["trainee_name",x=>`<b>${esc(x.ar||x.en)}</b>`],["trainer",x=>esc(pname(person(x.trainer))||"—")],["course",x=>esc(x.course_ar||x.course_en||"—")],["date",x=>x.date?fmtDate(x.date):"—"],["cert_no",x=>`<span class="mono">${esc(x.certno||"—")}</span>`]],{filter:x=>tr==="all"||x.trainer===tr,preset:tr!=="all"?{trainer:tr}:null})}
+ else if(S.dTab==="videos")body=`<h2>${t("a_videos")}</h2>`+crud("videos",[["image",v=>{const th=vThumb(v);return th?`<img src="${esc(th)}" alt="" style="width:88px;height:50px;object-fit:cover;border-radius:6px">`:"—"}],["title_ar",v=>`<b>${esc(v.ar||v.en)}</b>`],["category",v=>t("vcat_"+v.cat)],["presenter",v=>esc(pname(person(v.member))||"—")],["featured",v=>t(v.featured==="no"?"no":"yes")]],{extra:v=>`<button class="btn btn-ghost btn-sm" data-act="playv" data-id="${esc(v.id)}">${t("view")}</button>`});
  else if(S.dTab==="posts")body=`<h2>${t("a_posts")}</h2>`+crud("posts",[["type",p=>`<span class="pill info">${t("type_"+(p.type||"article"))}</span>`],["title_ar",p=>`<b>${esc(p.ar||p.en)}</b>`],["date",p=>fmtDate(p.date)],["published",p=>p.published==="no"?`<span class="pill warn">${t("pub_no")}</span>`:`<span class="pill ok">${t("pub_yes")}</span>`]],{extra:p=>`<a class="btn btn-ghost btn-sm" href="#post-${esc(p.id)}">${t("view")}</a>`});
  else if(S.dTab==="gallery")body=`<h2>${t("a_gallery")}</h2>`+crud("gallery",[["image",g=>g.img?`<img src="${esc(g.img)}" alt="" style="width:72px;height:54px;object-fit:cover;border-radius:6px">`:"—"],["title_ar",g=>`<b>${esc(g.ar||g.en||"—")}</b>`],["category",g=>t("gcat_"+g.cat)],["featured",g=>t(g.featured==="no"?"no":"yes")]]);
  else if(S.dTab==="settings")body=settingsView();
@@ -891,7 +1035,7 @@ V.admin=()=>{
  else if(S.dTab==="services")body=`<h2>${t("a_services")}</h2>`+crud("services",[["icon",s=>`<span class="ico" style="display:inline-grid;width:34px;height:34px;place-items:center;color:var(--royal)">${(ICONS[s.ic]||"").replace('<svg','<svg width="20" height="20"')}</span>`],["name_ar",s=>`<b>${esc(s.ar)}</b>`],["name_en",s=>esc(s.en)]]);
  else if(S.dTab==="offices")body=`<h2>${t("a_offices")}</h2>`+crud("offices",[["city",o=>`<b>${esc(L(o))}</b>`],["country",o=>esc(S.lang==="ar"?o.car:o.cen)],["region",o=>t(o.region)],["type",o=>`<span class="pill ${o.type}">${optLabel("otype",o.type)}</span>`],["phone",o=>`<span class="mono">${esc(o.phone||"—")}</span>`]]);
  else if(S.dTab==="students")body=`<h2>${t("a_students")}</h2>${REAL?`<p class="muted">${t("students_hint_real")}</p>`:""}`+crud("students",[["ID",s=>`<span class="mono">${esc(s.id)}</span>`],["name",s=>`<b>${esc(s.name)}</b><div class="muted" style="font-size:.8rem">${esc(s.email)}</div>`],["country",s=>esc(s.country)],["program",s=>esc(L(prog(s.prog)))],["progress",s=>`<div style="min-width:90px"><div class="prog"><i style="width:${+s.progress||0}%"></i></div><span class="num muted" style="font-size:.78rem">${+s.progress||0}%</span></div>`],["status",s=>stPill(s.status)]],{extra:(s)=>`<button class="btn btn-ghost btn-sm" data-act="issuefor" data-id="${esc(s.id)}">${t("issue_cert")}</button>`});
- else if(S.dTab==="certs")body=`<h2>${t("a_certs")}</h2>`+crud("certs",[["cert_no",c=>`<span class="mono">${esc(c.no)}</span>`],["holder",c=>`<b>${esc(c.name)}</b>`],["program",c=>esc(L(prog(c.prog)))],["issued",c=>fmtDate(c.issued)],["expires",c=>c.expires?fmtDate(c.expires):"—"],["status",c=>stPill(certStatus(c))]],{extra:(c)=>`<button class="btn btn-ghost btn-sm" data-act="showcert" data-no="${esc(c.no)}">${t("view")}</button>${c.status==="revoked"?`<button class="btn btn-ghost btn-sm" data-act="restore" data-no="${esc(c.no)}">${t("restore")}</button>`:`<button class="btn btn-ghost btn-sm" data-act="revoke" data-no="${esc(c.no)}">${t("revoke")}</button>`}`});
+ else if(S.dTab==="certs"){const ck=S.ack||"all";body=`<h2>${t("a_certs")}</h2><div class="tabs" style="margin:0">${["all",...CKINDS].map(k=>`<button type="button" class="${k===ck?"on":""}" data-act="ack" data-k="${k}">${k==="all"?t("all"):t("kind_"+k)} <span class="num" style="opacity:.7">${k==="all"?D.certs.length:D.certs.filter(c=>(c.kind||"certificate")===k).length}</span></button>`).join("")}</div>`+crud("certs",[["cert_no",c=>`<span class="mono">${esc(c.no)}</span>`],["kind",c=>`<span class="pill info">${t("kind_"+(c.kind||"certificate"))}</span>`],["holder",c=>`<b>${esc(c.name)}</b>`],["program",c=>esc(certLabel(c))],["issued",c=>fmtDate(c.issued)],["expires",c=>c.expires?fmtDate(c.expires):"—"],["status",c=>stPill(certStatus(c))]],{extra:(c)=>`<button class="btn btn-ghost btn-sm" data-act="showcert" data-no="${esc(c.no)}">${t("view")}</button>${c.status==="revoked"?`<button class="btn btn-ghost btn-sm" data-act="restore" data-no="${esc(c.no)}">${t("restore")}</button>`:`<button class="btn btn-ghost btn-sm" data-act="revoke" data-no="${esc(c.no)}">${t("revoke")}</button>`}`,filter:c=>ck==="all"||(c.kind||"certificate")===ck,preset:ck!=="all"?{kind:ck}:null})}
  else if(S.dTab==="apps")body=`<h2>${t("a_apps")}</h2>`+crud("apps",[["ID",a=>`<span class="mono">${esc(a.id)}</span>`],["name",a=>`<b>${esc(a.name)}</b><div class="muted" style="font-size:.8rem">${esc(a.email)}</div>`],["country",a=>esc(a.country)],["program",a=>esc(L(prog(a.prog)))],["experience",a=>`<span class="num">${esc(a.exp)}</span>`],["date",a=>fmtDate(a.date)],["status",a=>stPill(a.status)]],{extra:(a)=>a.status==="new"?`<button class="btn btn-gold btn-sm" data-act="appok" data-id="${esc(a.id)}">${t("approve")}</button><button class="btn btn-ghost btn-sm" data-act="appno" data-id="${esc(a.id)}">${t("reject")}</button>`:""});
  else if(S.dTab==="inq"){
   D.inq.forEach(i=>i.read=true);save();
@@ -903,28 +1047,31 @@ V.admin=()=>{
 /* ---------- modals ---------- */
 function modal(html){const r=document.getElementById("modalRoot");r.innerHTML=`<div class="modal" data-act="mclose"><div class="box" onclick="event.stopPropagation()"><button class="x" type="button" data-act="mclose" aria-label="${t("close")}">✕</button>${html}</div></div>`}
 function closeModal(){document.getElementById("modalRoot").innerHTML=""}
-function certDoc(c){const p=prog(c.prog);return `<div class="certdoc"><img src="${logo()}" alt=""><div class="t">International Federation of Beauty Experts</div><div class="s">This is to certify that</div><div class="n">${esc(c.name)}</div><div class="s">has fulfilled all requirements and is hereby awarded</div><div class="p">${p.en} · ${p.ar}</div><div class="seals">${ACCR_KEYS.map(k=>`<img src="${accrLogo(k)}" alt="">`).join("")}</div><div class="foot"><div><b>${c.no}</b>Verify at ${esc((S.data.settings.website||"theifbe.com").replace(/^https?:\/\//,""))}</div><div style="text-align:end"><b>${fmtDate(c.issued)}</b>Date of issue</div></div></div>`}
+function certDoc(c){const k=c.kind||"certificate",ttl=certLabel(c),p=c.prog?S.data.programs.find(x=>x.id===c.prog):null,tEn=c.cten||(p?p.en:""),tAr=c.ctar||(p?p.ar:"");
+ const line={certificate:"has fulfilled all requirements and is hereby awarded",accreditation:"is hereby accredited as",membership:"is hereby admitted as a member of the Federation",presidency:"is hereby appointed as"}[k];
+ const kEn={certificate:"Professional Certificate",accreditation:"Certificate of Accreditation",membership:"Certificate of Membership",presidency:"Certificate of Presidency"}[k];
+ return `<div class="certdoc"><img src="${logo()}" alt=""><div class="t">International Federation of Beauty Experts</div><div class="kd">${kEn} · ${I18N.ar["cd_"+k]}</div><div class="s">This is to certify that</div><div class="n">${esc(c.name)}</div><div class="s">${line}</div>${tEn||tAr?`<div class="p">${esc([tEn,tAr].filter(Boolean).join(" · "))}</div>`:""}<div class="seals">${ACCR_KEYS.map(k=>`<img src="${accrLogo(k)}" alt="">`).join("")}</div><div class="foot"><div><b>${esc(c.no)}</b>Verify at ${esc((S.data.settings.website||"theifbe.com").replace(/^https?:\/\//,""))}</div><div style="text-align:end"><b>${c.issued?fmtDate(c.issued):"—"}</b>Date of issue</div></div></div>`}
 function applyModal(pid){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">${t("apply_title")}</h2><form class="form" id="aform">
  <label class="f">${t("program")}<select id="a_prog">${PROGRAMS.map(p=>`<option value="${p.id}" ${p.id===pid?"selected":""}>${L(p)}</option>`).join("")}</select></label>
  <div class="two"><label class="f">${t("name")}<input id="a_name" required></label><label class="f">${t("email")}<input id="a_email" type="email" required></label></div>
  <div class="two"><label class="f">${t("country")}<input id="a_country" required></label><label class="f">${t("experience")}<input id="a_exp" type="number" min="0" max="60" required></label></div>
  <label class="f">${t("specialty")}<input id="a_spec"></label>
  <div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("apply_btn")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
-function issueModal(sid){const st=S.data.students.find(x=>x.id===sid);const exp=new Date();exp.setFullYear(exp.getFullYear()+3);
- S.data.certs.push({__tmp:1,no:"",sid:st?.id||"",name:st?.name||"",prog:st?.prog||S.data.programs[0]?.id,office:S.data.offices[0]?.id,issued:TODAY,expires:exp.toISOString().slice(0,10),status:"valid"});
+function issueModal(pid){const p=person(pid),st=(S.data.students||[]).find(x=>x.id===pid),k=kindForCat(p?.cat);const exp=new Date();exp.setFullYear(exp.getFullYear()+3);
+ S.data.certs.push({__tmp:1,kind:k,no:p&&p.certno&&!S.data.certs.some(c=>c.no===p.certno)?p.certno:"",sid:p?.id||"",name:pname(p),prog:st?.prog||"",ctar:k==="presidency"||k==="membership"?(p?.tar||""):"",cten:k==="presidency"||k==="membership"?(p?.ten||""):"",office:S.data.offices[0]?.id,issued:TODAY,expires:k==="presidency"||k==="membership"?"":exp.toISOString().slice(0,10),status:"valid"});
  const i=S.data.certs.length-1;editModal("certs",i);const f=document.getElementById("eform");f.dataset.tmp="1";}
 function stuModal(){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">${t("add_student")}</h2><form class="form" id="sform"><div class="two"><label class="f">${t("name")}<input id="s_name" required></label><label class="f">${t("email")}<input id="s_email" type="email" required></label></div><div class="two"><label class="f">${t("country")}<input id="s_country" required></label><label class="f">${t("program")}<select id="s_prog">${PROGRAMS.map(p=>`<option value="${p.id}">${L(p)}</option>`).join("")}</select></label></div><div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("add_student")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
 function offModal(){modal(`<h2 style="font-size:1.3rem;margin-bottom:14px">${t("add_office")}</h2><form class="form" id="oform"><div class="two"><label class="f">${t("city")} (EN)<input id="o_en" required></label><label class="f">${t("city")} (AR)<input id="o_ar" required dir="rtl"></label></div><div class="two"><label class="f">${t("country")} (EN)<input id="o_cen" required></label><label class="f">${t("country")} (AR)<input id="o_car" required dir="rtl"></label></div><div class="two"><label class="f">${t("region")}<select id="o_reg">${["americas","mena","europe","asia"].map(r=>`<option value="${r}">${t(r)}</option>`).join("")}</select></label><label class="f">${t("type")}<select id="o_type"><option value="reg">${t("regional")}</option><option value="rep">${t("rep")}</option></select></label></div><div style="display:flex;gap:10px"><button class="btn btn-gold" type="submit">${t("add_office")}</button><button class="btn btn-ghost" type="button" data-act="mclose">${t("cancel")}</button></div></form>`)}
 const REGXY={americas:[230,150],mena:[510,175],europe:[430,95],asia:[640,140]};
-function nextCertNo(pid,date){const y=(date||TODAY).slice(0,4);let no;do{no=`IFBE-${y}-${pid}-${String(1000+Math.floor(Math.random()*9000))}`}while(S.data.certs.some(c=>c.no===no));return no}
+function nextCertNo(pid,date){const y=(date||TODAY).slice(0,4);pid=pid||"M";let no;do{no=`IFBE-${y}-${pid}-${String(1000+Math.floor(Math.random()*9000))}`}while(S.data.certs.some(c=>c.no===no));return no}
 
 /* ---------- render ---------- */
-const NAV=["home","about","programs","fashion","directory","news","verify","offices","contact"];
+const NAV=["home","about","programs","fashion","directory","videos","news","verify","contact"];
 function render(){
- const v=(location.hash.slice(1)||"home");const view=v.startsWith("post-")?"post":V[v]?v:"home";
+ const v=(location.hash.slice(1)||"home");const view=v.startsWith("post-")?"post":v.startsWith("m-")?"member":V[v]?v:"home";
  document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";
  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t));
- document.getElementById("nav").innerHTML=NAV.map(k=>`<a href="#${k}" class="${view===k||(view==="post"&&k==="news")?"on":""}">${t("nav_"+k)}</a>`).join("");
+ document.getElementById("nav").innerHTML=NAV.map(k=>`<a href="#${k}" class="${view===k||(view==="post"&&k==="news")||(view==="member"&&k==="directory")?"on":""}">${t("nav_"+k)}</a>`).join("");
  document.getElementById("nav").classList.remove("open");
  document.getElementById("langBtn").textContent=S.lang==="ar"?"English":"عربي";
  const ab=document.getElementById("acctBtn");ab.href=S.user&&S.user.role!=="pending"?"#"+S.user.role:"#login";document.getElementById("acctLbl").textContent=S.user?t("dashboard"):t("login");
@@ -935,7 +1082,7 @@ function render(){
  const dash=view==="student"||view==="admin";
  document.getElementById("footer").hidden=dash;
  if(!dash)document.getElementById("footer").innerHTML=`<div class="wrap"><div><div class="brand"><img src="${logo()}" alt="" style="width:52px;height:52px"><span><b>IFBE</b></span></div><p style="margin-top:12px;max-width:40ch;font-size:.9rem">${t("footer_about")}</p><div class="accr-row" style="margin-top:14px">${accrLogos()}</div></div>
- <div><h4>${t("quick")}</h4>${["about","programs","services","fashion","directory","news","offices"].map(k=>`<a href="#${k}">${t("nav_"+k)}</a>`).join("")}</div>
+ <div><h4>${t("quick")}</h4>${["about","programs","services","fashion","directory","videos","news","offices"].map(k=>`<a href="#${k}">${t("nav_"+k)}</a>`).join("")}</div>
  <div><h4>${t("nav_programs")}</h4>${PROGRAMS.map(p=>`<a href="#programs">${L(p)}</a>`).join("")}</div>
  <div><h4>${t("portals")}</h4><a href="#verify">${t("nav_verify")}</a><a href="#login" data-act="role" data-r="student">${t("student_portal")}</a><a href="#login" data-act="role" data-r="admin">${t("admin_portal")}</a><a href="#contact">${t("nav_contact")}</a></div></div>
  <div class="wrap base"><span>© ${TODAY.slice(0,4)} ${t("fullName")}. ${t("rights")}</span><span dir="ltr">${esc([S.data.settings.email,S.data.settings.phone,S.data.settings.website].filter(Boolean).join(" · "))}</span><span>${["facebook","instagram","linkedin","tiktok"].filter(k=>S.data.settings[k]).map(k=>`<a href="${esc(/^https?:/.test(S.data.settings[k])?S.data.settings[k]:"https://"+S.data.settings[k])}" target="_blank" rel="noopener" style="display:inline;margin-inline-end:12px">${k[0].toUpperCase()+k.slice(1)}</a>`).join("")}</span></div>`;
@@ -975,6 +1122,11 @@ document.addEventListener("click",e=>{
  if(a==="nf"){S.nf=b.dataset.f;render()}
  if(a==="gf"){S.gf=b.dataset.f;render()}
  if(a==="apc"){S.apc=b.dataset.c;S.q="";render()}
+ if(a==="ack"){S.ack=b.dataset.k;S.q="";render()}
+ if(a==="atr"){S.atr=b.dataset.id;S.q="";render()}
+ if(a==="trof"){S.atr=b.dataset.id;S.dTab="trainees";S.q="";render()}
+ if(a==="vf"){S.vf=b.dataset.f;render()}
+ if(a==="playv")playVideo(b.dataset.id);
  if(a==="lightbox")lightbox(b.dataset.id);
  if(a==="imgclear"){const h=document.getElementById(b.dataset.target),pv=document.getElementById(b.dataset.target+"_pv");if(h)h.value="";if(pv){pv.hidden=true;pv.removeAttribute("src")}}
  if(a==="copylink"){const u=location.href;const done=()=>toast(t("copied"));if(navigator.clipboard?.writeText)navigator.clipboard.writeText(u).then(done,()=>toast(u));else toast(u)}
@@ -990,7 +1142,7 @@ document.addEventListener("click",e=>{
  if(a==="edit")editModal(b.dataset.coll,+b.dataset.idx);
  if(a==="del"){const coll=b.dataset.coll;if(coll==="admins"&&D.admins.length<=1){toast(t("last_admin"));return}
   if(!b.dataset.armed){b.dataset.armed="1";b.textContent=t("confirm_q");setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t("del")}},3000);return}
-  D[coll].splice(+b.dataset.idx,1);save();render();toast(t("deleted"))}
+  const gone=D[coll].splice(+b.dataset.idx,1)[0];if(coll==="people"&&gone){const j=D.students.findIndex(x=>x.id===gone.id);if(j>=0)D.students.splice(j,1)}save();render();toast(t("deleted"))}
  if(a==="cg"){S.cg=+b.dataset.i;render()}
  if(a==="ctreset"){CGROUPS[+b.dataset.i][1].forEach(k=>{delete D.content.en[k];delete D.content.ar[k]});save();render();toast(t("reset_ok"))}
  if(a==="resetlogo"){D.settings.logo="";save();render()}
@@ -999,7 +1151,7 @@ document.addEventListener("click",e=>{
  if(a==="import"){try{const o=JSON.parse(document.getElementById("bk_in").value);if(!o||!Array.isArray(o.certs))throw 0;S.data=o;migrate();save();render();toast(t("imported"))}catch(err){toast(t("bad_json"))}}
  if(a==="revoke"||a==="restore"){const c=D.certs.find(x=>x.no===b.dataset.no);c.status=a==="revoke"?"revoked":"valid";save();render()}
  if(a==="appok"||a==="appno"){const ap=D.apps.find(x=>x.id===b.dataset.id);ap.status=a==="appok"?"approved":"rejected";
-  if(a==="appok")D.students.push({id:uid("S-"),name:ap.name,email:ap.email,country:ap.country,prog:ap.prog,status:"active",progress:0,joined:TODAY});save();render()}
+  if(a==="appok"){const pg=prog(ap.prog),cat=pg.track===1?"trainer":pg.track===2?"consultant":"graduate",np={id:uid("P-"),cat,rank:RANKS[cat][0],ar:ap.name,en:"",car:ap.country,cen:"",tar:"",ten:"",order:0};D.people.push(np);D.students.push({id:np.id,name:ap.name,email:ap.email,country:ap.country,prog:ap.prog,status:"active",progress:0,joined:TODAY})}save();render()}
  if(a==="reset"){if(!b.dataset.armed){b.dataset.armed="1";b.textContent=t("confirm_q");setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t("reset_demo")}},3000);return}S.data=structuredClone(SEED);save();toast(t("reset_ok"));render()}
 });
 document.addEventListener("input",e=>{if(e.target.id==="dq"){S.dq=e.target.value;const pos=e.target.selectionStart;render();const q=document.getElementById("dq");if(q){q.focus();q.setSelectionRange(pos,pos)}return}if(e.target.id==="q"){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=document.getElementById("q");if(q){q.focus();q.setSelectionRange(pos,pos)}}});
@@ -1029,6 +1181,7 @@ document.addEventListener("submit",e=>{
   if(REAL){sb.rpc("update_my_profile",{p_name:me.name,p_country:me.country}).then(({error})=>{if(error)toast(t("save_fail"));else{snap();toast(t("saved"));render()}})}else{save();toast(t("saved"));render()}}
 });
 function dropTmp(){const i=S.data.certs.findIndex(c=>c.__tmp);if(i>=0)S.data.certs.splice(i,1)}
+document.addEventListener("change",e=>{if(e.target.id!=="e_cat"||!document.getElementById("e_rank")||document.getElementById("eform")?.dataset.coll!=="people")return;const rs=RANKS[e.target.value]||RANK_ORDER;document.getElementById("e_rank").innerHTML=rs.map(r=>`<option value="${r}">${t("rank_"+r)}</option>`).join("")});
 document.addEventListener("change",e=>{if(!e.target.classList.contains("imgUp"))return;const tg=e.target.dataset.target,mx=+e.target.dataset.max||800,file=e.target.files[0];if(!file)return;
  const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement("canvas"),r=Math.min(mx/im.width,mx/im.height,1);c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);c.getContext("2d").drawImage(im,0,0,c.width,c.height);let url=c.toDataURL("image/webp",.82);if(!url.startsWith("data:image/webp"))url=c.toDataURL("image/jpeg",.85);
   const h=document.getElementById(tg),pv=document.getElementById(tg+"_pv");if(h)h.value=url;if(pv){pv.src=url;pv.hidden=false}};im.src=rd.result};rd.readAsDataURL(file)});
