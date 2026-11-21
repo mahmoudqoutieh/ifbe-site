@@ -1,4 +1,4 @@
-const LOGO="assets/img/logo.webp";
+const LOGO="assets/img/logo.webp?v=2";
 const ACCR={ieqm:"assets/img/accr-ieqm.webp",cpd:"assets/img/accr-cpd.webp",iso:"assets/img/accr-iso.webp"};
 const I18N={
 en:{
