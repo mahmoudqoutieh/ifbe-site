@@ -670,7 +670,7 @@ Object.assign(I18N.en,{
  g_members:"Members & videos",
  cat_board:"Global Board of Directors",board_title:"Members of the Global Board of Directors",board_lead:"The Global Board of Directors sets the Federation's direction, approves its standards and oversees its work across countries.",
  rank_board_chair:"Chair of the Global Board",rank_board_member:"Member of the Global Board",
- kind_board:"Board membership certificate",cd_board:"شهادة عضوية مجلس الإدارة العالمي",
+ board_empty:"The members of the Global Board of Directors will be announced soon.",kind_board:"Board membership certificate",cd_board:"شهادة عضوية مجلس الإدارة العالمي",
 });
 Object.assign(I18N.ar,{
  nav_directory:"الأعضاء",cta_directory:"الأعضاء",dir_title:"الأعضاء",dir_lead:"الرؤساء والرؤساء السابقون، والمدربون والمستشارون، وحملة الدبلوم والدكتوراه المهنية، وجميع أعضاء الاتحاد.",
@@ -693,7 +693,7 @@ Object.assign(I18N.ar,{
  g_members:"الأعضاء والفيديوهات",
  cat_board:"مجلس الإدارة العالمي",board_title:"أعضاء مجلس الإدارة العالمي للاتحاد",board_lead:"يتولى مجلس الإدارة العالمي رسم توجهات الاتحاد واعتماد معاييره والإشراف على أعماله في مختلف الدول.",
  rank_board_chair:"رئيس مجلس الإدارة العالمي",rank_board_member:"عضو مجلس الإدارة العالمي",
- kind_board:"شهادة عضوية مجلس الإدارة",cd_board:"شهادة عضوية مجلس الإدارة العالمي",
+ board_empty:"سيتم الإعلان عن أعضاء مجلس الإدارة العالمي قريباً.",kind_board:"شهادة عضوية مجلس الإدارة",cd_board:"شهادة عضوية مجلس الإدارة العالمي",
 });
 PCATS.splice(0,PCATS.length,"leader","board","former","trainer","consultant","graduate","member");
 RANKS.former=["former_president"];RANKS.board=["board_chair","board_member"];
@@ -777,9 +777,9 @@ V.directory=()=>{
   ${ranks.length>1?`<div class="chips">${["all",...ranks].map(r=>`<button type="button" class="${r===rk?"on":""}" data-act="drank" data-r="${r}">${r==="all"?t("all_ranks"):t("rank_"+r)}</button>`).join("")}</div>`:""}</div>
  ${list.length?`<div class="mgrid">${list.map(p=>personCard(p,c==="leader"&&(p.rank==="global_president"||p.rank==="global_vp"))).join("")}</div>`:`<div class="empty">${ico("users",34)}<p>${t("dir_empty")}</p></div>`}
 </div></section>`};
-function boardBlock(){const list=sortPeople((S.data.people||[]).filter(p=>p.cat==="board"));if(!list.length)return"";
+function boardBlock(){const list=sortPeople((S.data.people||[]).filter(p=>p.cat==="board"));
  return `<section class="blk board-band"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("cat_board")}</div><h2>${t("board_title")}</h2></div><p class="muted">${t("board_lead")}</p></div>
- <div class="mgrid">${list.slice(0,8).map(p=>personCard(p,p.rank==="board_chair")).join("")}</div>
+ ${list.length?`<div class="mgrid">${list.slice(0,8).map(p=>personCard(p,p.rank==="board_chair")).join("")}</div>`:`<div class="empty">${ico("users",34)}<p>${t("board_empty")}</p></div>`}
  ${list.length>8?`<div style="margin-top:22px"><a class="btn btn-ghost" href="#directory" data-act="dircat" data-c="board">${t("cat_board")}</a></div>`:""}</div></section>`}
 leadersBlock=function(){const top=sortPeople((S.data.people||[]).filter(p=>p.cat==="leader")).slice(0,4);if(!top.length)return"";
  return `<section class="blk"><div class="wrap"><div class="sec-head"><div><div class="eyebrow">${t("leaders_eyebrow")}</div><h2>${t("leaders_title")}</h2></div><p class="muted">${t("leaders_lead")}</p></div>
@@ -968,7 +968,7 @@ const CGROUPS=[
  ["g_quals",["quals_eyebrow","quals_title","quals_lead","q1","q2","q3","q4","q5","quals_note"]],
  ["g_fashion",["nav_fashion","fash_eyebrow","fash_title","fash_lead","fash_p1","fash_p1d","fash_p2","fash_p2d","fash_p3","fash_p3d","fash_cta","fash_cta2","fash_cta2d","gallery_eyebrow","gallery_title"]],
  ["g_dir",["leaders_eyebrow","leaders_title","leaders_lead","dir_title","dir_lead","cat_leader","cat_trainer","cat_consultant","cat_graduate","cat_member","news_title","news_lead"]],
- ["g_members",["nav_directory","dir_title","dir_lead","cat_leader","cat_board","board_title","board_lead","cat_former","cat_trainer","cat_consultant","cat_graduate","cat_member","nav_videos","videos_title","videos_lead","intro_title"]],
+ ["g_members",["nav_directory","dir_title","dir_lead","cat_leader","cat_board","board_title","board_lead","board_empty","cat_former","cat_trainer","cat_consultant","cat_graduate","cat_member","nav_videos","videos_title","videos_lead","intro_title"]],
  ["g_accr",["ieqm_t","ieqm_d","cpd_t","cpd_d","iso_t","iso_d"]],
  ["g_pages",["prog_title","prog_lead","svc_page_lead","verify_title","verify_lead","offices_title","offices_lead","contact_title","contact_lead"]],
  ["g_general",["fullName","footer_about","track_trainer","track_consult","track_acad","nav_home","nav_about","nav_programs","nav_services","nav_verify","nav_offices","nav_contact","nav_directory","nav_news","cta_directory"]],
